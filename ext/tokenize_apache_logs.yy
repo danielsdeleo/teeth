@@ -166,7 +166,7 @@ VALUE t_tokenize_apache_logs(VALUE self) {
   vor_curr_tok_hsh = rb_hash_new();
   rb_global_variable(&vor_curr_tok_hsh);
   /* error out on absurdly large strings */
-  if( strlen(RSTRING(self)->ptr) > 1000000){
+  if( RSTRING_LEN(self) > 1000000){
     rb_raise(rb_eArgError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars");
   }
   else{
@@ -178,7 +178,7 @@ VALUE t_tokenize_apache_logs(VALUE self) {
     VALUE hsh_key_id = ID2SYM(rb_intern("id"));
     VALUE hsh_val_id = rb_tainted_str_new2(new_uuid_str);
     rb_hash_aset(vor_curr_tok_hsh, hsh_key_id, hsh_val_id);
-    yy_scan_string(RSTRING(self)->ptr);
+    yy_scan_string(RSTRING_PTR(self));
     yylex();
     yy_delete_buffer(YY_CURRENT_BUFFER);
   }
