@@ -1,0 +1,6 @@
+*.o
+*.bundle
+*.so
+ext/Makefile
+.DS*
+*.tch
