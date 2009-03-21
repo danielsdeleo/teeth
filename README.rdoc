@@ -13,6 +13,9 @@ Right now, only Apache logs are supported; however, teeth doesn't depend on toke
 
 Support for other web servers as well as other types of servers (e.g., SMTP, etc.) and generic syslog logs is planned for the future.
 
+= Ruby 1.9
+Ruby 1.9 is supported via the ruby1.9 branch[http://github.com/danielsdeleo/teeth/tree/ruby1.9].
+
 = Shortcomings and Known Issues
 In addition to the lack of support for formats other than Apache error and access log described above, teeth currently: 
 * Does not keep strings of description text intact.  Instead all tokens that it sees which do not fall into a predefined catagory (like HTTP verb, response codes, URIs, etc.) are lumped together in one array.  This is also planned to be fixed in a later release
