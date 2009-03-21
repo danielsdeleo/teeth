@@ -1,0 +1,5 @@
+couchdb.localdomain:80 172.16.115.1 - - [13/Dec/2008:19:26:11 -0500] "GET /favicon.ico HTTP/1.1" 404 241 "http://172.16.115.130/" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1"
+couchdb.localdomain:80 172.16.115.1 - - [13/Dec/2008:19:26:13 -0500] "GET /asdlkf HTTP/1.1" 404 238 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1"
+couchdb.localdomain:80 172.16.115.1 - - [18/Dec/2008:23:09:31 -0500] "GET /sdf HTTP/1.1" 404 236 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.0.5) Gecko/2008120121 Firefox/3.0.5"
+couchdb.localdomain:80 172.16.115.1 - - [18/Dec/2008:23:09:31 -0500] "GET /favicon.ico HTTP/1.1" 404 241 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.0.5) Gecko/2008120121 Firefox/3.0.5"
+couchdb.localdomain:80 172.16.115.1 - - [18/Dec/2008:23:09:34 -0500] "GET /favicon.ico HTTP/1.1" 404 241 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.0.5) Gecko/2008120121 Firefox/3.0.5"
