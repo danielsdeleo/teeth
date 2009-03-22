@@ -10682,17 +10682,19 @@ char *yytext;
 #include <ruby.h>
 #include <uuid/uuid.h>
 
+/* prototypes */
 static VALUE vor_curr_tok_hsh;
 char *strip_ends(char *);
 void push_token_to_hash(char *, char *);
 VALUE t_tokenize_apache_logs(VALUE);
+void new_uuid(char *str_ptr);
 /* Definitions */
 /* 
 Covers most of the bases, but there are a F*-ton of these: http://www.zytrax.com/tech/web/browser_ids.htm 
 Also, handling of quotes is nieve. If it becomes a problem try something like 
 http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html#How-can-I-match-C_002dstyle-comments_003f
 */
-#line 10696 "ext/tokenize_apache_logs.yy.c"
+#line 10698 "ext/tokenize_apache_logs.yy.c"
 
 #define INITIAL 0
 
@@ -10858,13 +10860,13 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 90 "ext/tokenize_apache_logs.yy"
+#line 92 "ext/tokenize_apache_logs.yy"
 
   /* 
     Actions 
  */
   
-#line 10868 "ext/tokenize_apache_logs.yy.c"
+#line 10870 "ext/tokenize_apache_logs.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -10937,7 +10939,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 95 "ext/tokenize_apache_logs.yy"
+#line 97 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("ipv4_addr", yytext);
 }
@@ -10945,7 +10947,7 @@ YY_RULE_SETUP
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 99 "ext/tokenize_apache_logs.yy"
+#line 101 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("apache_err_datetime", yytext);
 }
@@ -10953,60 +10955,60 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 103 "ext/tokenize_apache_logs.yy"
+#line 105 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("apache_access_datetime", yytext);
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 107 "ext/tokenize_apache_logs.yy"
+#line 109 "ext/tokenize_apache_logs.yy"
 { push_token_to_hash("http_version", yytext);}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 109 "ext/tokenize_apache_logs.yy"
+#line 111 "ext/tokenize_apache_logs.yy"
 {  push_token_to_hash("browser_string", strip_ends(yytext));}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 111 "ext/tokenize_apache_logs.yy"
+#line 113 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("absolute_url", yytext);
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 115 "ext/tokenize_apache_logs.yy"
+#line 117 "ext/tokenize_apache_logs.yy"
 {push_token_to_hash("host", yytext);}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 117 "ext/tokenize_apache_logs.yy"
+#line 119 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("relative_url", yytext);
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 121 "ext/tokenize_apache_logs.yy"
+#line 123 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("error_level", yytext);
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 125 "ext/tokenize_apache_logs.yy"
+#line 127 "ext/tokenize_apache_logs.yy"
 { push_token_to_hash("http_response", yytext); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 127 "ext/tokenize_apache_logs.yy"
+#line 129 "ext/tokenize_apache_logs.yy"
 { push_token_to_hash("http_method", yytext);}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 129 "ext/tokenize_apache_logs.yy"
+#line 131 "ext/tokenize_apache_logs.yy"
 {
   push_token_to_hash("word", yytext);
 }
@@ -11014,15 +11016,15 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 133 "ext/tokenize_apache_logs.yy"
+#line 135 "ext/tokenize_apache_logs.yy"
 /* ignore */
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 134 "ext/tokenize_apache_logs.yy"
+#line 136 "ext/tokenize_apache_logs.yy"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 11026 "ext/tokenize_apache_logs.yy.c"
+#line 11028 "ext/tokenize_apache_logs.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -12015,7 +12017,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 134 "ext/tokenize_apache_logs.yy"
+#line 136 "ext/tokenize_apache_logs.yy"
 
 
 
@@ -12040,13 +12042,17 @@ void uuid_unparse_upper_sans_dash(const uuid_t uu, char *out)
                 uu[10], uu[11], uu[12], uu[13], uu[14], uu[15]);
 }
 
-void *new_uuid(char *str_ptr){
+void new_uuid(char *str_ptr){
   uuid_t new_uuid;
   uuid_generate_time(new_uuid);
   uuid_unparse_upper_sans_dash(new_uuid, str_ptr);
 }
 
-
+/* Processes a line from an Apache log file (error or access log) and returns a
+ * Hash of the form {:token_type => ["value1", "value2"...] ...}
+ * The types of tokens extracted are IPv4 addresses, HTTP verbs, response codes
+ * and version strings, hostnames, relative and absolute URIs, browser strings,
+ * error levels, and other words */
 VALUE t_tokenize_apache_logs(VALUE self) {
   char new_uuid_str[33];
   vor_curr_tok_hsh = rb_hash_new();

@@ -39,10 +39,12 @@
 #include <ruby.h>
 #include <uuid/uuid.h>
 
+/* prototypes */
 static VALUE vor_curr_tok_hsh;
 char *strip_ends(char *);
 void push_token_to_hash(char *, char *);
 VALUE t_tokenize_apache_logs(VALUE);
+void new_uuid(char *str_ptr);
 %}
 /* Definitions */
 
@@ -154,13 +156,17 @@ void uuid_unparse_upper_sans_dash(const uuid_t uu, char *out)
                 uu[10], uu[11], uu[12], uu[13], uu[14], uu[15]);
 }
 
-void *new_uuid(char *str_ptr){
+void new_uuid(char *str_ptr){
   uuid_t new_uuid;
   uuid_generate_time(new_uuid);
   uuid_unparse_upper_sans_dash(new_uuid, str_ptr);
 }
 
-
+/* Processes a line from an Apache log file (error or access log) and returns a
+ * Hash of the form {:token_type => ["value1", "value2"...] ...}
+ * The types of tokens extracted are IPv4 addresses, HTTP verbs, response codes
+ * and version strings, hostnames, relative and absolute URIs, browser strings,
+ * error levels, and other words */
 VALUE t_tokenize_apache_logs(VALUE self) {
   char new_uuid_str[33];
   vor_curr_tok_hsh = rb_hash_new();
