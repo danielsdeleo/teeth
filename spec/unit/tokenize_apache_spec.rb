@@ -51,6 +51,8 @@ describe "Apache Lexer Extension", "when lexing apache access logs" do
     @tokens5 = str5.tokenize_apache_logs
     str6 = %q{127.218.234.82 - - [26/Jan/2009:08:32:19 -0500] "GET /reports/REPORT9_3.pdf//admin/includes/header.php?bypass_installed=1&bypass_restrict=1&row_secure[account_theme]=../../../../../../../../../../../../../etc/passwd%00 HTTP/1.1" 404 5721}
     @tokens6 = str6.tokenize_apache_logs
+    str_naked_url = %q{127.218.234.82 - - [26/Jan/2009:08:32:19 -0500] "GET / HTTP/1.1" 404 5721}
+    @tokens_naked_url = str_naked_url.tokenize_apache_logs
   end
   
   it "provides hints for testing" do
@@ -95,6 +97,10 @@ describe "Apache Lexer Extension", "when lexing apache access logs" do
     @tokens4[:relative_url].first.should == "/scripts/..%255c%255c../winnt/system32/cmd.exe?/c+dir"
     @tokens5[:relative_url].first.should == "/reports/REPORT9_3.pdf//admin/includes/footer.php?admin_template_default=../../../../../../../../../../../../../etc/passwd%00"
     @tokens6[:relative_url].first.should == "/reports/REPORT9_3.pdf//admin/includes/header.php?bypass_installed=1&bypass_restrict=1&row_secure[account_theme]=../../../../../../../../../../../../../etc/passwd%00"
+  end
+  
+  it "should correctly extract ``/'' as a URL" do
+    @tokens_naked_url[:relative_url].should == ["/"]
   end
   
 end
