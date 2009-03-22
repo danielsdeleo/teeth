@@ -61,7 +61,7 @@ rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
-CLEAN.add ["ext/tokenize_apache_logs.bundle", "ext/tokenize_apache_logs.so"]
+CLEAN.add ["ext/tokenize_apache_logs.bundle", "ext/tokenize_apache_logs.so", "ext/*.o"]
 CLOBBER.add ["ext/Makefile", "ext/*.c"]
 
 namespace :ext do
