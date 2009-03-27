@@ -12175,10 +12175,9 @@ void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash) {
     case T_ARRAY:
       rb_ary_push(hsh_value, rb_tainted_str_new2(key_value.value));
       break;
-   default:
-      /* raise exception */
+/*   default:
       rb_raise(rb_eTypeError, "expecting member of hash to be nil or array");
-      break;
+      break; */
   }
 }
 
