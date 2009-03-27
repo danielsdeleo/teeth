@@ -1,4 +1,5 @@
 require 'teeth/tokenize_apache_logs'
+require 'teeth/tokenize_rails_logs'
 
 def be_greater_than(expected)
   simple_matcher("be greater than #{expected.to_s}") do |given, matcher|
