@@ -10740,15 +10740,16 @@ typedef struct {
   char *value;
 } KVPAIR;
 /* Globals (eww, globals!) */
-static VALUE vor_curr_tok_hsh;
 static KVPAIR EOF_KVPAIR = {"EOF", "EOF"};
 /* prototypes */
 char *strip_ends(char *);
 VALUE t_tokenize_apache_logs(VALUE);
 void new_uuid(char *str_ptr);
 void raise_error_for_string_too_long(VALUE string);
-void push_kv_pair_to_hash(KVPAIR key_value);
-void concat_word_to_string(KVPAIR key_value);
+void include_message_in_token_hash(VALUE message, VALUE token_hash);
+void add_uuid_to_token_hash(VALUE token_hash);
+void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash);
+void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Set the scanner name, and return type */
 #define YY_DECL KVPAIR flexscan(void)
 #define yyterminate() return EOF_KVPAIR
@@ -10758,7 +10759,7 @@ Covers most of the bases, but there are a F*-ton of these: http://www.zytrax.com
 Also, handling of quotes is nieve. If it becomes a problem try something like 
 http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html#How-can-I-match-C_002dstyle-comments_003f
 */
-#line 10762 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
+#line 10763 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
 
 #define INITIAL 0
 
@@ -10922,13 +10923,13 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 72 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 73 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 
   /* 
     Actions 
  */
   
-#line 10932 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
+#line 10933 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -11001,7 +11002,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 77 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 78 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR ipv4_addr = {"ipv4_addr", yytext};
   return ipv4_addr;
@@ -11010,7 +11011,7 @@ YY_RULE_SETUP
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 82 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 83 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR apache_err_datetime = { "apache_err_datetime", yytext};
   return apache_err_datetime;
@@ -11019,7 +11020,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 87 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 88 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR apache_access_datetime = {"apache_access_datetime", yytext};
   return apache_access_datetime;
@@ -11027,7 +11028,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 92 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 93 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 { 
   KVPAIR http_version = {"http_version", yytext};
   return http_version;
@@ -11035,7 +11036,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 97 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 98 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR browser_string = {"browser_string", strip_ends(yytext)};
   return browser_string;
@@ -11043,7 +11044,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 102 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 103 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR absolute_url = {"absolute_url", yytext};
   return absolute_url;
@@ -11051,7 +11052,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 107 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 108 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR host = {"host", yytext};
   return host;
@@ -11059,7 +11060,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 112 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 113 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR relative_url = {"relative_url", yytext};
   return relative_url;
@@ -11067,7 +11068,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 117 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 118 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR error_level = {"error_level", yytext};
   return error_level;
@@ -11075,7 +11076,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 122 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 123 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR http_response = {"http_response", yytext};
   return http_response;
@@ -11083,7 +11084,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 127 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 128 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR http_method = {"http_method", yytext};
   return http_method;
@@ -11091,7 +11092,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 132 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 133 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR word = {"strings", yytext};
   return word;
@@ -11100,15 +11101,15 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 137 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 138 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 /* ignore */
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 138 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 139 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 11112 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
+#line 11113 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -12060,7 +12061,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 138 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 139 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 
 
 
@@ -12106,19 +12107,14 @@ VALUE t_tokenize_apache_logs(VALUE self) {
   KVPAIR kv_result;
   int scan_complete = 0;
   int building_words_to_string = 0;
-  char new_uuid_str[33];
-  vor_curr_tok_hsh = rb_hash_new();
-  rb_global_variable(&vor_curr_tok_hsh);
+  VALUE token_hash = rb_hash_new();
+
   /* error out on absurdly large strings */
   raise_error_for_string_too_long(self);
-  
-  VALUE hsh_key_msg = ID2SYM(rb_intern("message"));
   /* {:message => self()} */
-  rb_hash_aset(vor_curr_tok_hsh, hsh_key_msg, self);
-  new_uuid(new_uuid_str);
-  VALUE hsh_key_id = ID2SYM(rb_intern("id"));
-  VALUE hsh_val_id = rb_tainted_str_new2(new_uuid_str);
-  rb_hash_aset(vor_curr_tok_hsh, hsh_key_id, hsh_val_id);
+  include_message_in_token_hash(self, token_hash);
+  /* {:id => UUID} */
+  add_uuid_to_token_hash(token_hash);
   yy_scan_string(RSTRING(self)->ptr);
   while (scan_complete == 0) {
     kv_result = flexscan();
@@ -12129,38 +12125,52 @@ VALUE t_tokenize_apache_logs(VALUE self) {
       /* build a string until we get a non-word */
       if (building_words_to_string == 0){
         building_words_to_string = 1;
-        push_kv_pair_to_hash(kv_result);
+        push_kv_pair_to_hash(kv_result, token_hash);
       }
       else{
-        concat_word_to_string(kv_result);
+        concat_word_to_string(kv_result, token_hash);
       }    
     }    
     else {
       building_words_to_string = 0;
-      push_kv_pair_to_hash(kv_result);
+      push_kv_pair_to_hash(kv_result, token_hash);
     }
   }
   yy_delete_buffer(YY_CURRENT_BUFFER);
-  return rb_obj_dup(vor_curr_tok_hsh);
+  return rb_obj_dup(token_hash);
 }
 
-void concat_word_to_string(KVPAIR key_value) {
+void add_uuid_to_token_hash(VALUE token_hash) {
+  char new_uuid_str[33];
+  new_uuid(new_uuid_str);
+  VALUE hsh_key_id = ID2SYM(rb_intern("id"));
+  VALUE hsh_val_id = rb_tainted_str_new2(new_uuid_str);
+  rb_hash_aset(token_hash, hsh_key_id, hsh_val_id);
+}
+
+void include_message_in_token_hash(VALUE message, VALUE token_hash) {
+  /* {:message => self()} */  
+  VALUE hsh_key_msg = ID2SYM(rb_intern("message"));
+  rb_hash_aset(token_hash, hsh_key_msg, message);
+}
+
+void concat_word_to_string(KVPAIR key_value, VALUE token_hash) {
   char * space = " ";
   VALUE hsh_key = ID2SYM(rb_intern(key_value.key));
-  VALUE hsh_value = rb_hash_aref(vor_curr_tok_hsh, hsh_key);
+  VALUE hsh_value = rb_hash_aref(token_hash, hsh_key);
   VALUE string = rb_ary_entry(hsh_value, -1);
   rb_str_cat(string, space, 1);
   rb_str_cat(string, key_value.value, yyleng);
 }
 
-void push_kv_pair_to_hash(KVPAIR key_value) {
+void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash) {
   VALUE hsh_key = ID2SYM(rb_intern(key_value.key));
-  VALUE hsh_value = rb_hash_aref(vor_curr_tok_hsh, hsh_key);
+  VALUE hsh_value = rb_hash_aref(token_hash, hsh_key);
   VALUE ary_for_token_type = rb_ary_new();
   switch (TYPE(hsh_value)) {
     case T_NIL:
       rb_ary_push(ary_for_token_type, rb_tainted_str_new2(key_value.value));
-      rb_hash_aset(vor_curr_tok_hsh, hsh_key, ary_for_token_type);
+      rb_hash_aset(token_hash, hsh_key, ary_for_token_type);
       break;
     case T_ARRAY:
       rb_ary_push(hsh_value, rb_tainted_str_new2(key_value.value));

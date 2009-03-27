@@ -12,15 +12,16 @@ typedef struct {
   char *value;
 } KVPAIR;
 /* Globals (eww, globals!) */
-static VALUE vor_curr_tok_hsh;
 static KVPAIR EOF_KVPAIR = {"EOF", "EOF"};
 /* prototypes */
 char *strip_ends(char *);
 VALUE t_tokenize_apache_logs(VALUE);
 void new_uuid(char *str_ptr);
 void raise_error_for_string_too_long(VALUE string);
-void push_kv_pair_to_hash(KVPAIR key_value);
-void concat_word_to_string(KVPAIR key_value);
+void include_message_in_token_hash(VALUE message, VALUE token_hash);
+void add_uuid_to_token_hash(VALUE token_hash);
+void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash);
+void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Set the scanner name, and return type */
 #define YY_DECL KVPAIR flexscan(void)
 #define yyterminate() return EOF_KVPAIR
@@ -179,19 +180,14 @@ VALUE t_tokenize_apache_logs(VALUE self) {
   KVPAIR kv_result;
   int scan_complete = 0;
   int building_words_to_string = 0;
-  char new_uuid_str[33];
-  vor_curr_tok_hsh = rb_hash_new();
-  rb_global_variable(&vor_curr_tok_hsh);
+  VALUE token_hash = rb_hash_new();
+
   /* error out on absurdly large strings */
   raise_error_for_string_too_long(self);
-  
-  VALUE hsh_key_msg = ID2SYM(rb_intern("message"));
   /* {:message => self()} */
-  rb_hash_aset(vor_curr_tok_hsh, hsh_key_msg, self);
-  new_uuid(new_uuid_str);
-  VALUE hsh_key_id = ID2SYM(rb_intern("id"));
-  VALUE hsh_val_id = rb_tainted_str_new2(new_uuid_str);
-  rb_hash_aset(vor_curr_tok_hsh, hsh_key_id, hsh_val_id);
+  include_message_in_token_hash(self, token_hash);
+  /* {:id => UUID} */
+  add_uuid_to_token_hash(token_hash);
   yy_scan_string(RSTRING(self)->ptr);
   while (scan_complete == 0) {
     kv_result = flexscan();
@@ -202,38 +198,52 @@ VALUE t_tokenize_apache_logs(VALUE self) {
       /* build a string until we get a non-word */
       if (building_words_to_string == 0){
         building_words_to_string = 1;
-        push_kv_pair_to_hash(kv_result);
+        push_kv_pair_to_hash(kv_result, token_hash);
       }
       else{
-        concat_word_to_string(kv_result);
+        concat_word_to_string(kv_result, token_hash);
       }    
     }    
     else {
       building_words_to_string = 0;
-      push_kv_pair_to_hash(kv_result);
+      push_kv_pair_to_hash(kv_result, token_hash);
     }
   }
   yy_delete_buffer(YY_CURRENT_BUFFER);
-  return rb_obj_dup(vor_curr_tok_hsh);
+  return rb_obj_dup(token_hash);
 }
 
-void concat_word_to_string(KVPAIR key_value) {
+void add_uuid_to_token_hash(VALUE token_hash) {
+  char new_uuid_str[33];
+  new_uuid(new_uuid_str);
+  VALUE hsh_key_id = ID2SYM(rb_intern("id"));
+  VALUE hsh_val_id = rb_tainted_str_new2(new_uuid_str);
+  rb_hash_aset(token_hash, hsh_key_id, hsh_val_id);
+}
+
+void include_message_in_token_hash(VALUE message, VALUE token_hash) {
+  /* {:message => self()} */  
+  VALUE hsh_key_msg = ID2SYM(rb_intern("message"));
+  rb_hash_aset(token_hash, hsh_key_msg, message);
+}
+
+void concat_word_to_string(KVPAIR key_value, VALUE token_hash) {
   char * space = " ";
   VALUE hsh_key = ID2SYM(rb_intern(key_value.key));
-  VALUE hsh_value = rb_hash_aref(vor_curr_tok_hsh, hsh_key);
+  VALUE hsh_value = rb_hash_aref(token_hash, hsh_key);
   VALUE string = rb_ary_entry(hsh_value, -1);
   rb_str_cat(string, space, 1);
   rb_str_cat(string, key_value.value, yyleng);
 }
 
-void push_kv_pair_to_hash(KVPAIR key_value) {
+void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash) {
   VALUE hsh_key = ID2SYM(rb_intern(key_value.key));
-  VALUE hsh_value = rb_hash_aref(vor_curr_tok_hsh, hsh_key);
+  VALUE hsh_value = rb_hash_aref(token_hash, hsh_key);
   VALUE ary_for_token_type = rb_ary_new();
   switch (TYPE(hsh_value)) {
     case T_NIL:
       rb_ary_push(ary_for_token_type, rb_tainted_str_new2(key_value.value));
-      rb_hash_aset(vor_curr_tok_hsh, hsh_key, ary_for_token_type);
+      rb_hash_aset(token_hash, hsh_key, ary_for_token_type);
       break;
     case T_ARRAY:
       rb_ary_push(hsh_value, rb_tainted_str_new2(key_value.value));
