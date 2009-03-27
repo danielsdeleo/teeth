@@ -62,27 +62,53 @@ rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
-CLEAN.add ["ext/tokenize_apache_logs.bundle", "ext/tokenize_apache_logs.so", "ext/*.o"]
-CLOBBER.add ["ext/Makefile", "ext/*.c"]
+CLEAN.add ["ext/*/*.bundle", "ext/*/*.so", "ext/*/*.o"]
+CLOBBER.add ["ext/*/Makefile", "ext/*/*.c"]
 
 namespace :ext do
   desc "Installs the C extensions.  Usually requires root."
   task :install => :build do
-    Dir.chdir("ext/") {sh "make install"}
+    Dir.glob("ext/*/").each do |ext_dir|
+      Dir.chdir(ext_dir) {sh "make install"}
+    end
   end
 
   desc "Compiles the C extensions"
-  task :build => ["ext/tokenize_apache_logs.yy.c","ext/Makefile"] do
-    Dir.chdir("ext/") {sh "make"}
+  task :build do |t|
+    Dir.glob("ext/*/").each do |ext_dir|
+      cd(ext_dir) {sh "make"}
+    end
   end
-
-  file 'ext/tokenize_apache_logs.yy.c' => 'ext/tokenize_apache_logs.yy' do |t|
-    sh "flex -i -s -o ext/tokenize_apache_logs.yy.c ext/tokenize_apache_logs.yy"    
+  
+  desc "Generates Makefiles with extconf/mkmf"
+  task :makefiles
+  
+  FileList["ext/*/*.yy"].each do |flex_file|
+    flex_generated_c = flex_file.ext("yy.c")
+    file flex_generated_c => flex_file do |t|
+      sh "flex -i -s -o #{flex_generated_c} #{flex_file}"
+    end
+    task :build => flex_generated_c
+    file flex_file
   end
-
-  file 'ext/tokenize_apache_logs.yy'
-
-  file "ext/Makefile" do
-    Dir.chdir("ext/") {ruby "./extconf.rb"}
+  
+  FileList["ext/*/extconf.rb"].each do |extconf_file|
+    extension_dir = extconf_file.sub("extconf.rb", '')
+    makefile = extension_dir + "Makefile"
+    file makefile => extconf_file do |t|
+      Dir.chdir(extension_dir) {ruby "./extconf.rb"}
+    end
+    file extconf_file
+    task :build => makefile
   end
+    
+#  file 'ext/tokenize_apache_logs.yy.c' => 'ext/tokenize_apache_logs.yy' do |t|
+#    sh "flex -i -s -o ext/tokenize_apache_logs.yy.c ext/tokenize_apache_logs.yy"    
+#  end
+
+#  file 'ext/tokenize_apache_logs.yy'
+
+#  file "ext/Makefile" do
+#    Dir.chdir("ext/") {ruby "./extconf.rb"}
+#  end
 end
