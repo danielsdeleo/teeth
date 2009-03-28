@@ -332,6 +332,9 @@ void yyfree (void *  );
 
 /* Begin user sect3 */
 
+#define yywrap(n) 1
+#define YY_SKIP_YYWRAP
+
 typedef char YY_CHAR;
 
 FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
@@ -10731,7 +10734,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 /* %option prefix="vor_yy" */
-#line 7 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 8 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 #include <ruby.h>
 #include <uuid/uuid.h>
 /* Data types */
@@ -10764,7 +10767,7 @@ Covers most of the bases, but there are a F*-ton of these: http://www.zytrax.com
 Also, handling of quotes is nieve. If it becomes a problem try something like 
 http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html#How-can-I-match-C_002dstyle-comments_003f
 */
-#line 10768 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
+#line 10771 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
 
 #define INITIAL 0
 
@@ -10928,13 +10931,13 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 78 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 79 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 
   /* 
     Actions 
  */
   
-#line 10938 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
+#line 10941 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -11007,7 +11010,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 83 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 84 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR ipv4_addr = {"ipv4_addr", yytext};
   return ipv4_addr;
@@ -11016,7 +11019,7 @@ YY_RULE_SETUP
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 88 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 89 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR apache_err_datetime = { "apache_err_datetime", yytext};
   return apache_err_datetime;
@@ -11025,7 +11028,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 93 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 94 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR apache_access_datetime = {"apache_access_datetime", yytext};
   return apache_access_datetime;
@@ -11033,7 +11036,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 98 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 99 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 { 
   KVPAIR http_version = {"http_version", yytext};
   return http_version;
@@ -11041,7 +11044,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 103 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 104 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR browser_string = {"browser_string", strip_ends(yytext)};
   return browser_string;
@@ -11049,7 +11052,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 108 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 109 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR absolute_url = {"absolute_url", yytext};
   return absolute_url;
@@ -11057,7 +11060,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 113 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 114 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR host = {"host", yytext};
   return host;
@@ -11065,7 +11068,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 118 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 119 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR relative_url = {"relative_url", yytext};
   return relative_url;
@@ -11073,7 +11076,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 123 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 124 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR error_level = {"error_level", yytext};
   return error_level;
@@ -11081,7 +11084,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 128 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 129 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR http_response = {"http_response", yytext};
   return http_response;
@@ -11089,7 +11092,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 133 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 134 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR http_method = {"http_method", yytext};
   return http_method;
@@ -11097,7 +11100,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 138 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 139 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 {
   KVPAIR word = {"strings", yytext};
   return word;
@@ -11106,15 +11109,15 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 143 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 144 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 /* ignore */
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 144 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 145 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 11118 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
+#line 11121 "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -12066,7 +12069,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 144 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
+#line 145 "ext/tokenize_apache_logs/tokenize_apache_logs.yy"
 
 
 

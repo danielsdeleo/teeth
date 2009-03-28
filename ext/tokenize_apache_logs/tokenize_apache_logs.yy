@@ -3,6 +3,7 @@
 %option never-interactive
 %option read
 %option nounput
+%option noyywrap
 %{
 #include <ruby.h>
 #include <uuid/uuid.h>
