@@ -13,7 +13,7 @@ module Teeth
     end
     
     def scanner_name
-      "teeth_tokenize_" + @scanner_base_name.to_s
+      "teeth_scan_" + @scanner_base_name.to_s
     end
     
     def main_function_name
@@ -22,6 +22,14 @@ module Teeth
     
     def init_function_name
       "Init_" + scanner_name
+    end
+    
+    def function_prefix
+      @scanner_base_name.to_s + "_yy"
+    end
+    
+    def entry_point
+      "scan_" + @scanner_base_name.to_s
     end
     
     def rdoc=(rdoc_text)

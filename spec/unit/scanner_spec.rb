@@ -17,9 +17,11 @@ IPV4_ACTION_TEXT =
   
   it "should initialize with a name for for the tokenizer function and method" do
     scanner = Scanner.new(:rails_dev_logs)
-    scanner.scanner_name.should == "teeth_tokenize_rails_dev_logs"
-    scanner.main_function_name.should == "t_teeth_tokenize_rails_dev_logs"
-    scanner.init_function_name.should == "Init_teeth_tokenize_rails_dev_logs"
+    scanner.scanner_name.should == "teeth_scan_rails_dev_logs"
+    scanner.main_function_name.should == "t_teeth_scan_rails_dev_logs"
+    scanner.init_function_name.should == "Init_teeth_scan_rails_dev_logs"
+    scanner.function_prefix.should == "rails_dev_logs_yy"
+    scanner.entry_point.should == "scan_rails_dev_logs"
   end
   
   it "should format rdoc for the C function which corresponds to the ruby method" do
@@ -92,7 +94,7 @@ IPV4_ACTION_TEXT =
     @scanner.scanner_rules.first.scanner_code.should == IPV4_ACTION_TEXT
   end
   
-  it "should generate an rule to short circuit scanner processing when given option :skip_line => true" do
+  it "should generate a rule to short circuit scanner processing when given option :skip_line => true" do
     @scanner.rule :rails_session_id_start, '{WS}*Session ID":"', :skip_line => true
     expected = 
 %q|{WS}*Session ID":" {
