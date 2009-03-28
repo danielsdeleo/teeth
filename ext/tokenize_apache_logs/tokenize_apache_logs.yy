@@ -25,6 +25,11 @@ void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Set the scanner name, and return type */
 #define YY_DECL KVPAIR flexscan(void)
 #define yyterminate() return EOF_KVPAIR
+/* Ruby 1.8 and 1.9 compatibility */
+#if !defined(RSTRING_LEN) 
+# define RSTRING_LEN(x) (RSTRING(x)->len) 
+# define RSTRING_PTR(x) (RSTRING(x)->ptr) 
+#endif 
 %}
 
 /* Definitions */
@@ -166,7 +171,7 @@ void new_uuid(char *str_ptr){
 }
 
 void raise_error_for_string_too_long(VALUE string){
-  if( strlen(RSTRING(string)->ptr) > 1000000){
+  if( RSTRING_LEN(string) > 1000000){
     rb_raise(rb_eArgError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars"); 
   }
 }
@@ -188,7 +193,7 @@ VALUE t_tokenize_apache_logs(VALUE self) {
   include_message_in_token_hash(self, token_hash);
   /* {:id => UUID} */
   add_uuid_to_token_hash(token_hash);
-  yy_scan_string(RSTRING(self)->ptr);
+  yy_scan_string(RSTRING_PTR(self));
   while (scan_complete == 0) {
     kv_result = flexscan();
     if (kv_result.key == "EOF"){
