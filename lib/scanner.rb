@@ -4,7 +4,7 @@ module Teeth
   end
   
   class Scanner
-    TEMPLATE = File.dirname(__FILE__) + "/../../templates/tokenizer.yy.erb"
+    TEMPLATE = File.dirname(__FILE__) + "/../templates/tokenizer.yy.erb"
     attr_reader :scanner_defns, :scanner_rules, :rdoc
     
     def initialize(name)
