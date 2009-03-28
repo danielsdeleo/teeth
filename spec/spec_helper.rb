@@ -1,6 +1,8 @@
 require 'teeth/tokenize_apache_logs'
 require 'teeth/tokenize_rails_logs'
 
+require File.dirname(__FILE__) + "/../lib/teeth"
+
 def be_greater_than(expected)
   simple_matcher("be greater than #{expected.to_s}") do |given, matcher|
     matcher.failure_message = "expected #{given.to_s} to be greater than #{expected.to_s}"
@@ -9,3 +11,5 @@ def be_greater_than(expected)
   end
   
 end
+
+include Teeth

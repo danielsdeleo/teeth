@@ -1,1 +1,2 @@
-require "teeth/tokenize_apache_logs"
+$:.unshift File.dirname(__FILE__) + "/"
+require "teeth/scanner"
