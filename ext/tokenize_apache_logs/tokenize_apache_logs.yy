@@ -1,9 +1,9 @@
-/* %option prefix="vor_yy" */
+%option prefix="tokenize_apache_logs_yy"
 %option full
 %option never-interactive
 %option read
 %option nounput
-%option noyywrap
+%option noyywrap noreject noyymore nodefault
 %{
 #include <ruby.h>
 #include <uuid/uuid.h>
