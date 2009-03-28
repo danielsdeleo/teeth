@@ -1,38 +1,3 @@
-/*
- * uuid_unparse_upper_sans_dash is derived from the uuid library
- * from OS X / darwin, therefore:
- *
- * Copyright (c) 2004 Apple Computer, Inc. All rights reserved.
- *
- * %Begin-Header%
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
- *    products derived from this software without specific prior
- *    written permission.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
- * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
- * %End-Header%
- */
-
 /* %option prefix="vor_yy" */
 %option full
 %{
@@ -48,11 +13,17 @@ void new_uuid(char *str_ptr);
 %}
 /* Definitions */
 
+RAILS_TEASER (processing|session|parameters|set[\000-\s]language[\000-\s]to|redirected|rendered|completed)
+
+CONTROLLER_ACTION [a-z]+#[a-z]+
+
 IP4_OCT [0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]
 
 WDAY (Mon|Tue|Wed|Thu|Fri|Sat|Sun)
 
 MON (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+
+MON_NUM (0[1-9]|1[0-2])
 
 MDAY (3[0-1]|[1-2][0-9]|0[1-9])
 
@@ -80,22 +51,27 @@ HTTPCODE (100|101|20[0-6]|30[0-5]|307|40[0-9]|41[0-7]|50[0-5])
 
 WS  [\000-\s]
 
-/* 
-Covers most of the bases, but there are a F*-ton of these: http://www.zytrax.com/tech/web/browser_ids.htm 
-Also, handling of quotes is nieve. If it becomes a problem try something like 
-http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html#How-can-I-match-C_002dstyle-comments_003f
-*/
-BROWSER_STR \"(moz|msie|lynx).+\"
-
 NON_WS ([a-z]|[0-9]|[:punct:])
 
 %%
   /* 
     Actions 
  */
+
+{RAILS_TEASER} {
+  push_token_to_hash("rails_teaser", yytext);
+}
+
+{CONTROLLER_ACTION} {
+  push_token_to_hash("rails_controller_action", yytext);
+}
   
 {IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}  {
   push_token_to_hash("ipv4_addr", yytext);
+}
+
+{YEAR}\-{MON_NUM}\-{MDAY}{WS}{HOUR}\:{MINSEC}\:{MINSEC} {
+  push_token_to_hash("rails_datetime", yytext);
 }
 
 {WDAY}{WS}{MON}{WS}{MDAY}{WS}{HOUR}\:{MINSEC}\:{MINSEC}{WS}{YEAR} {
@@ -107,8 +83,6 @@ NON_WS ([a-z]|[0-9]|[:punct:])
 }
 
 {HTTP_VERS} { push_token_to_hash("http_version", yytext);}
-
-{BROWSER_STR} {  push_token_to_hash("browser_string", strip_ends(yytext));}
 
 {PROTO}"\/\/"({HOST}|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT})({REL_URL}|"\/")? {
   push_token_to_hash("absolute_url", yytext);
@@ -126,7 +100,7 @@ NON_WS ([a-z]|[0-9]|[:punct:])
 
 {HTTPCODE} { push_token_to_hash("http_response", yytext); }
 
-{HTTP_VERB} { push_token_to_hash("http_method", yytext);}
+\[{HTTP_VERB}\] { push_token_to_hash("http_method", strip_ends(yytext));}
 
 {NON_WS}{NON_WS}*   {
   push_token_to_hash("word", yytext);
@@ -167,12 +141,12 @@ void new_uuid(char *str_ptr){
  * The types of tokens extracted are IPv4 addresses, HTTP verbs, response codes
  * and version strings, hostnames, relative and absolute URIs, browser strings,
  * error levels, and other words */
-VALUE t_tokenize_apache_logs(VALUE self) {
+VALUE t_tokenize_rails_logs(VALUE self) {
   char new_uuid_str[33];
   vor_curr_tok_hsh = rb_hash_new();
   rb_global_variable(&vor_curr_tok_hsh);
   /* error out on absurdly large strings */
-  if( strlen(RSTRING(self)->ptr) > 1000000){
+  if( RSTRING_LEN(self) > 1000000){
     rb_raise(rb_eArgError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars");
   }
   else{
@@ -184,7 +158,7 @@ VALUE t_tokenize_apache_logs(VALUE self) {
     VALUE hsh_key_id = ID2SYM(rb_intern("id"));
     VALUE hsh_val_id = rb_tainted_str_new2(new_uuid_str);
     rb_hash_aset(vor_curr_tok_hsh, hsh_key_id, hsh_val_id);
-    yy_scan_string(RSTRING(self)->ptr);
+    yy_scan_string(RSTRING_PTR(self));
     yylex();
     yy_delete_buffer(YY_CURRENT_BUFFER);
   }
@@ -210,6 +184,6 @@ void push_token_to_hash(char * token_type, char * token_val) {
   }
 }
 
-void Init_tokenize_apache_logs() {
-  rb_define_method(rb_cString, "tokenize_apache_logs", t_tokenize_apache_logs, 0);
+void Init_tokenize_rails_logs() {
+  rb_define_method(rb_cString, "tokenize_rails_logs", t_tokenize_rails_logs, 0);
 }

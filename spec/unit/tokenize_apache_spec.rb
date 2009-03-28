@@ -30,6 +30,10 @@ describe "Apache Lexer Extension", "when lexing apache errors" do
     @tokens[:relative_url].first.should == ".\\.\\.\\.\\.\\.\\.\\.\\.\\.\\/winnt/win.ini"
   end
   
+  it "should group unknown tokens into strings" do
+    @tokens[:strings].should == ["client", "Invalid URI in request"]
+  end
+  
   it "should error out if the string is longer than 1M chars" do
     str = ((("abcDE" * 2) * 1000) * 100) + "X"
     lambda {str.tokenize_apache_logs[:word]}.should raise_error(ArgumentError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars")
