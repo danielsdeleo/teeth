@@ -36,7 +36,7 @@ describe "Apache Lexer Extension", "when lexing apache errors" do
   
   it "should error out if the string is longer than 1M chars" do
     str = ((("abcDE" * 2) * 1000) * 100) + "X"
-    lambda {str.tokenize_apache_logs[:word]}.should raise_error(ArgumentError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars")
+    lambda {str.tokenize_apache_logs}.should raise_error(ArgumentError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars")
   end
   
 end
