@@ -1,4 +1,4 @@
-/* %option prefix="vor_yy" */
+%option prefix="<%= scanner.function_prefix %>"
 %option full
 %option never-interactive
 %option read
@@ -22,7 +22,7 @@ void add_uuid_to_token_hash(VALUE token_hash);
 void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash);
 void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Set the scanner name, and return type */
-#define YY_DECL KVPAIR flexscan(void)
+#define YY_DECL KVPAIR <%= scanner.entry_point %>(void)
 #define yyterminate() return EOF_KVPAIR
 /* Ruby 1.8 and 1.9 compatibility */
 #if !defined(RSTRING_LEN) 
@@ -35,7 +35,7 @@ void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Definitions */
 
 <% scanner.scanner_defns.each do |scanner_defn| %>
-<%= scanner_defn.scanner_code + "\n" %>
+<%= scanner_defn.scanner_code %>
 <% end %>
 
 %%
@@ -44,7 +44,7 @@ void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
  */
   
 <% scanner.scanner_rules.each do |scanner_rule| %>
-<%= scanner_rule.scanner_code + "\n" %>
+<%= scanner_rule.scanner_code %>
 <% end %>
 (.|"\n") /* ignore */
 %%
