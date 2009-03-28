@@ -10743,7 +10743,7 @@ typedef struct {
   char *value;
 } KVPAIR;
 /* Globals (eww, globals!) */
-static KVPAIR EOF_KVPAIR = {"EOF", "EOF"};
+const KVPAIR EOF_KVPAIR = {"EOF", "EOF"};
 /* prototypes */
 char *strip_ends(char *);
 VALUE t_tokenize_apache_logs(VALUE);
