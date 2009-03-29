@@ -8266,7 +8266,12 @@ void raise_error_for_string_too_long(VALUE string){
   }
 }
 
-
+/* Scans self, which is expected to be a single line from an Apache error or
+ * access log, and returns a Hash of the components of the log message.  The
+ * following parts of the log message are returned if they are present:
+ * IPv4 address, datetime, HTTP Version used, the browser string given by the
+ * client, any absolute or relative URLs, the error level, HTTP response code,
+ * HTTP Method (verb), and any other uncategorized strings present. */
 VALUE t_scan_apache_logs(VALUE self) {
   KVPAIR kv_result;
   int scan_complete = 0;

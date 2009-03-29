@@ -289,7 +289,11 @@ void raise_error_for_string_too_long(VALUE string){
   }
 }
 
-
+/* Scans self, which is expected to be a line from a Rails production or dev log,
+ * and returns a Hash of the significant features in the log message, including
+ * the IP address of the client, the Controller and Action, any partials rendered,
+ * and the time spent rendering them, the duration of the DB request(s), the HTTP
+ * verb, etc. */
 VALUE t_scan_rails_logs(VALUE self) {
   KVPAIR kv_result;
   int scan_complete = 0;

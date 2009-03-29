@@ -1,6 +1,13 @@
 require File.dirname(__FILE__) + "/../lib/teeth"
 scanner = Teeth::Scanner.new(:rails_logs, File.dirname(__FILE__) + '/../ext/scan_rails_logs/')
 scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
+scanner.rdoc = <<-RDOC
+Scans self, which is expected to be a line from a Rails production or dev log,
+and returns a Hash of the significant features in the log message, including 
+the IP address of the client, the Controller and Action, any partials rendered,
+and the time spent rendering them, the duration of the DB request(s), the HTTP
+verb, etc.
+RDOC
 scanner.definitions do |define|
   define.RAILS_TEASER '(processing|filter\ chain\ halted|rendered)'
   define.CONTROLLER_ACTION '[a-z0-9]+#[a-z0-9]+'

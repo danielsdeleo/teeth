@@ -1,6 +1,14 @@
 require File.dirname(__FILE__) + "/../lib/teeth"
 scanner = Teeth::Scanner.new(:apache_logs, File.dirname(__FILE__) + '/../ext/scan_apache_logs/')
 scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
+scanner.rdoc = <<-RDOC
+Scans self, which is expected to be a single line from an Apache error or 
+access log, and returns a Hash of the components of the log message.  The
+following parts of the log message are returned if they are present:
+IPv4 address, datetime, HTTP Version used, the browser string given by the 
+client, any absolute or relative URLs, the error level, HTTP response code,
+HTTP Method (verb), and any other uncategorized strings present.
+RDOC
 scanner.rules do |r|
   r.ipv4_addr '{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}'
   r.apache_err_datetime '{WDAY}{WS}{MON}{WS}{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC}{WS}{YEAR}'
