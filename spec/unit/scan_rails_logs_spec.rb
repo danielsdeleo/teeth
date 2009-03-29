@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 require "teeth/scan_rails_logs"
 # special shout out to Willem van Bergen, author of request-log-analyzer:
 # http://github.com/wvanbergen/request-log-analyzer/
-# Stole the rails request logs from there...
+# Thanks for the log samples!
 
 describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   
@@ -33,31 +33,38 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   
   it "should extract the duration, view duration, db duration, HTTP status code, and url from a ``Completed'' line for Rails 1.x" do
     rails_1x = %q{Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]}
-    pending("once generated scanner supports start conditions/BEGIN")
     result = rails_1x.scan_rails_logs
+    puts "\n==completed (1.x): " + result.inspect
     result[:teaser].first.should == "Completed in"
     result[:duration_s].first.should == "0.21665"
-    result[:rendering_duration_s].first.should == "0.00926"
-    result[:db_duration_s].first.should == "0.00000"
+    result[:view_s].first.should == "0.00926"
+    result[:db_s].first.should == "0.00000"
     result[:http_response].first.should == "200"
     result[:url].first.should == "http://demo.nu/employees"
   end
   
   it "should extract the relevant components from a ``Completed'' line for Rails 2.x" do
     rails_2x =  %q{Completed in 614ms (View: 120, DB: 31) | 200 OK [http://floorplanner.local/demo]}
-    pending("once generated scanner supports start conditions/BEGIN")
+    result = rails_2x.scan_rails_logs
+    puts "\n==completed (2.x): " + result.inspect
+    result[:teaser].first.should == "Completed in"
+    result[:duration_ms].first.should == "614"
+    result[:view_ms].first.should == "120"
+    result[:db_ms].first.should == "31"
+    result[:http_response].first.should == "200"
+    result[:url].first.should == "http://floorplanner.local/demo"
   end
 
   it "should extract the duration and partial from a ``Rendered'' line for rails 2.x" do
     rendered_2x = "Rendered shared/_analytics (0.2ms)"
-    puts "(rendered 2.x): " + rendered_2x.scan_rails_logs.inspect
+    #puts "(rendered 2.x): " + rendered_2x.scan_rails_logs.inspect
     rendered_2x.scan_rails_logs[:partial].first.should == "shared/_analytics"
     rendered_2x.scan_rails_logs[:render_duration_ms].first.should == "0.2"
   end
   
   it "should extract the duration and partial from a ``Rendered'' line for rails 1.x" do
     rendered_1x = "Rendered layouts/_doc_type (0.00001)"
-    puts "(rendered 1.x): " + rendered_1x.scan_rails_logs.inspect
+    #puts "(rendered 1.x): " + rendered_1x.scan_rails_logs.inspect
     rendered_1x.scan_rails_logs[:partial].first.should == "layouts/_doc_type"
     rendered_1x.scan_rails_logs[:render_duration_s].first.should == "0.00001"
   end
@@ -69,7 +76,7 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   
   it "should not return a teaser for session id continuation lines" do
     session_id_contd = "ZWR7ADoNbGFuZ3VhZ2VvOhNMb2NhbGU6Ok9iamVjdBI6CUB3aW4wOg1AY291"
-    puts session_id_contd.scan_rails_logs[:teaser].should be_nil
+    session_id_contd.scan_rails_logs[:teaser].should be_nil
   end
   
   it "should give a non falsy value for :end_session_id at for the last line of a session id" do

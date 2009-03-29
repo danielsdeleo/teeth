@@ -35,6 +35,8 @@ void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 
 /* Definitions */
 
+CATCHALL (.|"\n")
+
 <% scanner.scanner_defns.each do |scanner_defn| %>
 <%= scanner_defn.scanner_code %>
 <% end %>
@@ -47,7 +49,7 @@ void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 <% scanner.scanner_rules.each do |scanner_rule| %>
 <%= scanner_rule.scanner_code %>
 <% end %>
-(.|"\n") /* ignore */
+{CATCHALL} /* ignore */
 %%
 
 char *strip_ends(char *string) {
@@ -89,7 +91,9 @@ VALUE <%= scanner.main_function_name %>(VALUE self) {
   int scan_complete = 0;
   int building_words_to_string = 0;
   VALUE token_hash = rb_hash_new();
-
+  
+  BEGIN(INITIAL);
+  
   /* error out on absurdly large strings */
   raise_error_for_string_too_long(self);
   /* {:message => self()} */

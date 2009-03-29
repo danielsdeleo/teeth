@@ -7090,7 +7090,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 76 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 80 "ext/scan_apache_logs/scan_apache_logs.yy"
 
   /* 
     Actions 
@@ -7170,7 +7170,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 82 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 86 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR ipv4_addr = {"ipv4_addr", apache_logs_yytext};
   return ipv4_addr;
@@ -7179,7 +7179,7 @@ YY_RULE_SETUP
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 88 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 91 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR apache_err_datetime = {"apache_err_datetime", apache_logs_yytext};
   return apache_err_datetime;
@@ -7188,7 +7188,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 94 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 96 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR apache_access_datetime = {"apache_access_datetime", apache_logs_yytext};
   return apache_access_datetime;
@@ -7196,7 +7196,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 100 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 101 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR http_version = {"http_version", apache_logs_yytext};
   return http_version;
@@ -7212,7 +7212,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 112 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 111 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR absolute_url = {"absolute_url", apache_logs_yytext};
   return absolute_url;
@@ -7220,7 +7220,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 118 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 116 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR host = {"host", apache_logs_yytext};
   return host;
@@ -7228,7 +7228,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 124 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 121 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR relative_url = {"relative_url", apache_logs_yytext};
   return relative_url;
@@ -7236,7 +7236,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 130 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 126 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR error_level = {"error_level", apache_logs_yytext};
   return error_level;
@@ -7244,7 +7244,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 136 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 131 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR http_response = {"http_response", apache_logs_yytext};
   return http_response;
@@ -7252,7 +7252,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 142 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 136 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR http_method = {"http_method", apache_logs_yytext};
   return http_method;
@@ -7260,7 +7260,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 148 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 141 "ext/scan_apache_logs/scan_apache_logs.yy"
 {
   KVPAIR strings = {"strings", apache_logs_yytext};
   return strings;
@@ -7269,12 +7269,12 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 154 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 146 "ext/scan_apache_logs/scan_apache_logs.yy"
 /* ignore */
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 155 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 147 "ext/scan_apache_logs/scan_apache_logs.yy"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
 #line 7281 "ext/scan_apache_logs/scan_apache_logs.yy.c"
@@ -8229,7 +8229,7 @@ void apache_logs_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 155 "ext/scan_apache_logs/scan_apache_logs.yy"
+#line 147 "ext/scan_apache_logs/scan_apache_logs.yy"
 
 
 
@@ -8272,7 +8272,9 @@ VALUE t_scan_apache_logs(VALUE self) {
   int scan_complete = 0;
   int building_words_to_string = 0;
   VALUE token_hash = rb_hash_new();
-
+  
+  BEGIN(INITIAL);
+  
   /* error out on absurdly large strings */
   raise_error_for_string_too_long(self);
   /* {:message => self()} */

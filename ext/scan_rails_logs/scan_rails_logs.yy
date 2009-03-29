@@ -1,4 +1,4 @@
-%option prefix="apache_logs_yy"
+%option prefix="rails_logs_yy"
 %option full
 %option never-interactive
 %option read
@@ -15,7 +15,7 @@ typedef struct {
 const KVPAIR EOF_KVPAIR = {"EOF", "EOF"};
 /* prototypes */
 char *strip_ends(char *);
-VALUE t_scan_apache_logs(VALUE);
+VALUE t_scan_rails_logs(VALUE);
 void new_uuid(char *str_ptr);
 void raise_error_for_string_too_long(VALUE string);
 void include_message_in_token_hash(VALUE message, VALUE token_hash);
@@ -23,7 +23,7 @@ void add_uuid_to_token_hash(VALUE token_hash);
 void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash);
 void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Set the scanner name, and return type */
-#define YY_DECL KVPAIR scan_apache_logs(void)
+#define YY_DECL KVPAIR scan_rails_logs(void)
 #define yyterminate() return EOF_KVPAIR
 /* Ruby 1.8 and 1.9 compatibility */
 #if !defined(RSTRING_LEN) 
@@ -76,6 +76,24 @@ HTTPCODE (100|101|20[0-6]|30[0-5]|307|40[0-9]|41[0-7]|50[0-5])
 
 BROWSER_STR \"(moz|msie|lynx).+\"
 
+RAILS_TEASER (processing|filter\ chain\ halted|rendered)
+
+CONTROLLER_ACTION [a-z0-9]+#[a-z0-9]+
+
+RAILS_SKIP_LINES (session\ id)
+
+CACHE_HIT actioncontroller"::"caching"::"actions"::"actioncachefilter":"0x[0-9a-f]+
+
+PARTIAL_SESSION_ID ^([a-z0-9]+"="*"-"+[a-z0-9]+)
+
+RAILS_ERROR_CLASS ([a-z]+\:\:)*[a-z]+error
+
+%x REQUEST_COMPLETED
+
+%x COMPLETED_REQ_VIEW_STATS
+
+%x COMPLETED_REQ_DB_STATS
+
 
 %%
   /* 
@@ -83,60 +101,152 @@ BROWSER_STR \"(moz|msie|lynx).+\"
  */
   
 
+{RAILS_TEASER} {
+  KVPAIR teaser = {"teaser", yytext};
+  return teaser;
+}
+
+{CONTROLLER_ACTION} {
+  KVPAIR controller_action = {"controller_action", yytext};
+  return controller_action;
+}
+
 {IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT} {
   KVPAIR ipv4_addr = {"ipv4_addr", yytext};
   return ipv4_addr;
 }
 
-{WDAY}{WS}{MON}{WS}{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC}{WS}{YEAR} {
-  KVPAIR apache_err_datetime = {"apache_err_datetime", yytext};
-  return apache_err_datetime;
-}
-
-{MDAY}\/{MON}\/{YEAR}":"{HOUR}":"{MINSEC}":"{MINSEC}{WS}{PLUSMINUS}{YEAR} {
-  KVPAIR apache_access_datetime = {"apache_access_datetime", yytext};
-  return apache_access_datetime;
-}
-
-{HTTP_VERS} {
-  KVPAIR http_version = {"http_version", yytext};
-  return http_version;
-}
-
-{BROWSER_STR} {
-  KVPAIR browser_string = {"browser_string", strip_ends(yytext)};
-  return browser_string;
-}
-
-{PROTO}"\/\/"({HOST}|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT})({REL_URL}|"\/")? {
-  KVPAIR absolute_url = {"absolute_url", yytext};
-  return absolute_url;
-}
-
-{HOST} {
-  KVPAIR host = {"host", yytext};
-  return host;
-}
-
-{REL_URL} {
-  KVPAIR relative_url = {"relative_url", yytext};
-  return relative_url;
-}
-
-{ERR_LVL} {
-  KVPAIR error_level = {"error_level", yytext};
-  return error_level;
-}
-
-{HTTPCODE} {
-  KVPAIR http_response = {"http_response", yytext};
-  return http_response;
+{YEAR}"-"{MONTH_NUM}"-"{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC} {
+  KVPAIR datetime = {"datetime", yytext};
+  return datetime;
 }
 
 {HTTP_VERB} {
   KVPAIR http_method = {"http_method", yytext};
   return http_method;
 }
+
+{RAILS_SKIP_LINES} {
+  return EOF_KVPAIR;
+}
+
+{PARTIAL_SESSION_ID} {
+  KVPAIR end_session_id = {"end_session_id", yytext};
+  return end_session_id;
+}
+
+{RAILS_ERROR_CLASS} {
+  KVPAIR error = {"error", yytext};
+  return error;
+}
+
+\(({WS}|{NON_WS})+\) {
+  KVPAIR error_message = {"error_message", strip_ends(yytext)};
+  return error_message;
+}
+
+"#"[0-9]+{WS} {
+  KVPAIR line_number = {"line_number", strip_ends(yytext)};
+  return line_number;
+}
+
+{WS}{REL_URL}":" {
+  KVPAIR file_and_line = {"file_and_line", strip_ends(yytext)};
+  return file_and_line;
+}
+
+{CACHE_HIT} {
+  KVPAIR cache_hit = {"cache_hit", yytext};
+  return cache_hit;
+}
+
+[a-z0-9]+{REL_URL}/\ \( {
+  KVPAIR partial = {"partial", yytext};
+  return partial;
+}
+
+[0-9\.]+/ms\) {
+  KVPAIR render_duration_ms = {"render_duration_ms", yytext};
+  return render_duration_ms;
+}
+
+\([0-9\.]+\) {
+  KVPAIR render_duration_s = {"render_duration_s", strip_ends(yytext)};
+  return render_duration_s;
+}
+
+completed\ in {
+  BEGIN(REQUEST_COMPLETED);
+  KVPAIR teaser = {"teaser", yytext};
+  return teaser;
+}
+
+<REQUEST_COMPLETED>[0-9]+\.[0-9]+ {
+  KVPAIR duration_s = {"duration_s", yytext};
+  return duration_s;
+}
+
+<REQUEST_COMPLETED>[0-9]+/ms {
+  KVPAIR duration_ms = {"duration_ms", yytext};
+  return duration_ms;
+}
+
+<REQUEST_COMPLETED>(View":"|Rendering":") {
+  BEGIN(COMPLETED_REQ_VIEW_STATS);
+  KVPAIR start_view_stats = {"start_view_stats", yytext};
+  return start_view_stats;
+}
+
+<COMPLETED_REQ_VIEW_STATS>([0-9]+\.[0-9]+) {
+  BEGIN(REQUEST_COMPLETED);
+  KVPAIR view_s = {"view_s", yytext};
+  return view_s;
+}
+
+<COMPLETED_REQ_VIEW_STATS>[0-9]+ {
+  BEGIN(REQUEST_COMPLETED);
+  KVPAIR view_ms = {"view_ms", yytext};
+  return view_ms;
+}
+
+<COMPLETED_REQ_VIEW_STATS>{CATCHALL}
+
+<REQUEST_COMPLETED>DB":" {
+  BEGIN(COMPLETED_REQ_DB_STATS);
+  KVPAIR start_db_stats = {"start_db_stats", yytext};
+  return start_db_stats;
+}
+
+<COMPLETED_REQ_DB_STATS>[0-9]+\.[0-9]+ {
+  BEGIN(REQUEST_COMPLETED);
+  KVPAIR db_s = {"db_s", yytext};
+  return db_s;
+}
+
+<COMPLETED_REQ_DB_STATS>[0-9]+ {
+  BEGIN(REQUEST_COMPLETED);
+  KVPAIR db_ms = {"db_ms", yytext};
+  return db_ms;
+}
+
+<COMPLETED_REQ_DB_STATS>{CATCHALL}
+
+<REQUEST_COMPLETED>\[{PROTO}"\/\/"({HOST}|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT})({REL_URL}|"\/")?\] {
+  KVPAIR url = {"url", strip_ends(yytext)};
+  return url;
+}
+
+<REQUEST_COMPLETED>{HTTPCODE} {
+  KVPAIR http_response = {"http_response", yytext};
+  return http_response;
+}
+
+<REQUEST_COMPLETED>{NON_WS}{NON_WS}* {
+  KVPAIR strings = {"strings", yytext};
+  return strings;
+}
+
+<REQUEST_COMPLETED>{CATCHALL}
 
 {NON_WS}{NON_WS}* {
   KVPAIR strings = {"strings", yytext};
@@ -175,12 +285,12 @@ void new_uuid(char *str_ptr){
 
 void raise_error_for_string_too_long(VALUE string){
   if( RSTRING_LEN(string) > 1000000){
-    rb_raise(rb_eArgError, "string too long for scan_apache_logs! max length is 1,000,000 chars"); 
+    rb_raise(rb_eArgError, "string too long for scan_rails_logs! max length is 1,000,000 chars"); 
   }
 }
 
 
-VALUE t_scan_apache_logs(VALUE self) {
+VALUE t_scan_rails_logs(VALUE self) {
   KVPAIR kv_result;
   int scan_complete = 0;
   int building_words_to_string = 0;
@@ -196,7 +306,7 @@ VALUE t_scan_apache_logs(VALUE self) {
   add_uuid_to_token_hash(token_hash);
   yy_scan_string(RSTRING_PTR(self));
   while (scan_complete == 0) {
-    kv_result = scan_apache_logs();
+    kv_result = scan_rails_logs();
     if (kv_result.key == "EOF"){
       scan_complete = 1;
     }
@@ -257,6 +367,6 @@ void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash) {
   }
 }
 
-void Init_scan_apache_logs() {
-  rb_define_method(rb_cString, "scan_apache_logs", t_scan_apache_logs, 0);
+void Init_scan_rails_logs() {
+  rb_define_method(rb_cString, "scan_rails_logs", t_scan_rails_logs, 0);
 }
