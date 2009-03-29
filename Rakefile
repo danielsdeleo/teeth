@@ -37,30 +37,46 @@ begin
     s.has_rdoc = true
     s.extra_rdoc_files = ["README.rdoc"]
     s.require_path = ["lib"]
-    s.required_ruby_version = '<=1.9.0' # different branch for 1.8 and 1.9...
     s.authors = ["Daniel DeLeo"]
-    s.extensions = ["ext/extconf.rb"]
-    s.rubyforge_project = "bloomfilter"
+    s.extensions = ["ext/tokenize_apache_logs/extconf.rb"]
 
     # ruby -rpp -e' pp `git ls-files`.split("\n") '
-    s.files = ["README.rdoc",
-       "Rakefile",
-       "ext/extconf.rb",
-       "ext/tokenize_apache_logs.yy",
-       "ext/tokenize_apache_logs.yy.c",
-       "lib/teeth.rb",
-       "spec/fixtures/access.log",
-       "spec/fixtures/big-access.log",
-       "spec/fixtures/big-error.log",
-       "spec/fixtures/error.log",
-       "spec/fixtures/med-error.log",
-       "spec/spec.opts",
-       "spec/spec_helper.rb",
-       "spec/unit/tokenize_apache_spec.rb"]
+    s.files = ["LICENSE",
+     "README.rdoc",
+     "Rakefile",
+     "VERSION.yml",
+     "ext/tokenize_apache_logs/Makefile",
+     "ext/tokenize_apache_logs/extconf.rb",
+     "ext/tokenize_apache_logs/tokenize_apache_logs.yy",
+     "ext/tokenize_apache_logs/tokenize_apache_logs.yy.c",
+     "ext/tokenize_rails_logs/Makefile",
+     "ext/tokenize_rails_logs/extconf.rb",
+     "ext/tokenize_rails_logs/tokenize_rails_logs.yy",
+     "ext/tokenize_rails_logs/tokenize_rails_logs.yy.c",
+     "lib/scanner.rb",
+     "lib/teeth.rb",
+     "spec/fixtures/rails_1x.log",
+     "spec/fixtures/rails_22.log",
+     "spec/fixtures/rails_22_cached.log",
+     "spec/fixtures/rails_unordered.log",
+     "spec/playground/show_apache_processing.rb",
+     "spec/spec.opts",
+     "spec/spec_helper.rb",
+     "spec/unit/scanner_spec.rb",
+     "spec/unit/tokenize_apache_spec.rb",
+     "spec/unit/tokenize_rails_request_spec.rb",
+     "teeth.gemspec",
+     "templates/tokenizer.yy.erb"]
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
+
+desc "outputs a list of files suitable for use with the gemspec"
+task :list_files do
+  sh %q{ruby -rpp -e' pp `git ls-files`.split("\n").reject {|f| f =~ /git/} '}
+end
+
 
 CLEAN.add ["ext/*/*.bundle", "ext/*/*.so", "ext/*/*.o"]
 CLOBBER.add ["ext/*/Makefile", "ext/*/*.c"]
@@ -101,5 +117,13 @@ namespace :ext do
     file extconf_file
     task :build => makefile
   end
+  
+  desc "Compiles Teeth::Scanner scanner definitions into flex scanner definition"
+  task :scanners do
+    FileList["scanners/*"].each do |scanner|
+      ruby scanner
+    end
+  end
+  
     
 end

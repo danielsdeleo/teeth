@@ -1,5 +1,5 @@
-require 'teeth/tokenize_apache_logs'
-require 'teeth/tokenize_rails_logs'
+require 'teeth/scan_apache_logs'
+#require 'teeth/scan_rails_logs'
 
 require File.dirname(__FILE__) + "/../lib/teeth"
 

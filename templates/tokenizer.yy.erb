@@ -3,6 +3,7 @@
 %option never-interactive
 %option read
 %option nounput
+%option noyywrap noreject noyymore nodefault
 %{
 #include <ruby.h>
 #include <uuid/uuid.h>
@@ -77,7 +78,7 @@ void new_uuid(char *str_ptr){
 }
 
 void raise_error_for_string_too_long(VALUE string){
-  if( RSTRING_LEN(string)) > 1000000){
+  if( RSTRING_LEN(string) > 1000000){
     rb_raise(rb_eArgError, "string too long for <%=scanner.scanner_name %>! max length is 1,000,000 chars"); 
   }
 }
@@ -97,7 +98,7 @@ VALUE <%= scanner.main_function_name %>(VALUE self) {
   add_uuid_to_token_hash(token_hash);
   yy_scan_string(RSTRING_PTR(self));
   while (scan_complete == 0) {
-    kv_result = flexscan();
+    kv_result = <%= scanner.entry_point %>();
     if (kv_result.key == "EOF"){
       scan_complete = 1;
     }

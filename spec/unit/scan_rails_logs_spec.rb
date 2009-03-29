@@ -7,6 +7,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   
   it "should extract the Controller, action, IP, timestamp and HTTP verb from a ``Processing'' line" do
+    pending "the rails log scanner"
     line = %q{Processing PageController#demo (for 127.0.0.1 at 2008-12-10 16:28:09) [GET]}
     result = line.tokenize_rails_logs
     result[:rails_teaser].first.should == "Processing"
@@ -21,6 +22,7 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   end
   
   it "should extract an error, error_message, line of code, source code file, and stack_trace from a ``RuntimeError'' line" do
+    pending "the rails log scanner"
     line = %q{RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' }
     result = line.tokenize_rails_logs
   end

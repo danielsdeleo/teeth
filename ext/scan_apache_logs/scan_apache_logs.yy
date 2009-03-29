@@ -1,4 +1,4 @@
-%option prefix="tokenize_apache_logs_yy"
+%option prefix="apache_logs_yy"
 %option full
 %option never-interactive
 %option read
@@ -15,7 +15,7 @@ typedef struct {
 const KVPAIR EOF_KVPAIR = {"EOF", "EOF"};
 /* prototypes */
 char *strip_ends(char *);
-VALUE t_tokenize_apache_logs(VALUE);
+VALUE t_scan_apache_logs(VALUE);
 void new_uuid(char *str_ptr);
 void raise_error_for_string_too_long(VALUE string);
 void include_message_in_token_hash(VALUE message, VALUE token_hash);
@@ -23,18 +23,26 @@ void add_uuid_to_token_hash(VALUE token_hash);
 void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash);
 void concat_word_to_string(KVPAIR key_value, VALUE token_hash);
 /* Set the scanner name, and return type */
-#define YY_DECL KVPAIR flexscan(void)
+#define YY_DECL KVPAIR scan_apache_logs(void)
 #define yyterminate() return EOF_KVPAIR
 /* Ruby 1.8 and 1.9 compatibility */
 #if !defined(RSTRING_LEN) 
 # define RSTRING_LEN(x) (RSTRING(x)->len) 
 # define RSTRING_PTR(x) (RSTRING(x)->ptr) 
 #endif 
+
 %}
 
 /* Definitions */
 
+
+WS [[:space:]]
+
+NON_WS ([a-z]|[0-9]|[:punct:])
+
 IP4_OCT [0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]
+
+HOST [a-z0-9][a-z0-9\-]*\.[a-z0-9][a-z0-9\-]*.[a-z0-9][a-z0-9\-\.]*[a-z]+(\:[0-9]+)?
 
 WDAY mon|tue|wed|thu|fri|sat|sun
 
@@ -48,15 +56,13 @@ MINSEC [0-5][0-9]|60
 
 YEAR [0-9][0-9][0-9][0-9]
 
+PLUSMINUS (\+|\-)
+
 REL_URL (\/|\\|\.)[a-z0-9\._\~\-\/\?&;#=\%\:\+\[\]\\]*
 
 PROTO (http:|https:)
 
-HOST [a-z0-9][a-z0-9\-]*\.[a-z0-9][a-z0-9\-]*.[a-z0-9][a-z0-9\-\.]*[a-z]+(\:[0-9]+)?
-
 ERR_LVL (emerg|alert|crit|err|error|warn|warning|notice|info|debug)
-
-PLUSMINUS (\+|\-)
 
 HTTP_VERS HTTP\/(1.0|1.1)
 
@@ -64,81 +70,86 @@ HTTP_VERB (get|head|put|post|delete|trace|connect)
 
 HTTPCODE (100|101|20[0-6]|30[0-5]|307|40[0-9]|41[0-7]|50[0-5])
 
-WS  [\000-\s]
-
-/* 
-Covers most of the bases, but there are a F*-ton of these: http://www.zytrax.com/tech/web/browser_ids.htm 
-Also, handling of quotes is nieve. If it becomes a problem try something like 
-http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html#How-can-I-match-C_002dstyle-comments_003f
-*/
 BROWSER_STR \"(moz|msie|lynx).+\"
 
-NON_WS ([a-z]|[0-9]|[:punct:])
 
 %%
   /* 
     Actions 
  */
   
-{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}  {
+
+{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT} {
   KVPAIR ipv4_addr = {"ipv4_addr", yytext};
   return ipv4_addr;
 }
 
+
 {WDAY}{WS}{MON}{WS}{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC}{WS}{YEAR} {
-  KVPAIR apache_err_datetime = { "apache_err_datetime", yytext};
+  KVPAIR apache_err_datetime = {"apache_err_datetime", yytext};
   return apache_err_datetime;
 }
+
 
 {MDAY}\/{MON}\/{YEAR}":"{HOUR}":"{MINSEC}":"{MINSEC}{WS}{PLUSMINUS}{YEAR} {
   KVPAIR apache_access_datetime = {"apache_access_datetime", yytext};
   return apache_access_datetime;
 }
 
-{HTTP_VERS} { 
+
+{HTTP_VERS} {
   KVPAIR http_version = {"http_version", yytext};
   return http_version;
 }
+
 
 {BROWSER_STR} {
   KVPAIR browser_string = {"browser_string", strip_ends(yytext)};
   return browser_string;
 }
 
+
 {PROTO}"\/\/"({HOST}|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT})({REL_URL}|"\/")? {
   KVPAIR absolute_url = {"absolute_url", yytext};
   return absolute_url;
 }
+
 
 {HOST} {
   KVPAIR host = {"host", yytext};
   return host;
 }
 
-{REL_URL}   {
+
+{REL_URL} {
   KVPAIR relative_url = {"relative_url", yytext};
   return relative_url;
 }
+
 
 {ERR_LVL} {
   KVPAIR error_level = {"error_level", yytext};
   return error_level;
 }
 
+
 {HTTPCODE} {
   KVPAIR http_response = {"http_response", yytext};
   return http_response;
 }
+
 
 {HTTP_VERB} {
   KVPAIR http_method = {"http_method", yytext};
   return http_method;
 }
 
-{NON_WS}{NON_WS}*   {
-  KVPAIR word = {"strings", yytext};
-  return word;
+
+{NON_WS}{NON_WS}* {
+  KVPAIR strings = {"strings", yytext};
+  return strings;
 }
+
 
 (.|"\n") /* ignore */
 %%
@@ -172,16 +183,12 @@ void new_uuid(char *str_ptr){
 
 void raise_error_for_string_too_long(VALUE string){
   if( RSTRING_LEN(string) > 1000000){
-    rb_raise(rb_eArgError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars"); 
+    rb_raise(rb_eArgError, "string too long for scan_apache_logs! max length is 1,000,000 chars"); 
   }
 }
 
-/* Processes a line from an Apache log file (error or access log) and returns a
- * Hash of the form {:token_type => ["value1", "value2"...] ...}
- * The types of tokens extracted are IPv4 addresses, HTTP verbs, response codes
- * and version strings, hostnames, relative and absolute URIs, browser strings,
- * error levels, and other words */
-VALUE t_tokenize_apache_logs(VALUE self) {
+
+VALUE t_scan_apache_logs(VALUE self) {
   KVPAIR kv_result;
   int scan_complete = 0;
   int building_words_to_string = 0;
@@ -195,7 +202,7 @@ VALUE t_tokenize_apache_logs(VALUE self) {
   add_uuid_to_token_hash(token_hash);
   yy_scan_string(RSTRING_PTR(self));
   while (scan_complete == 0) {
-    kv_result = flexscan();
+    kv_result = scan_apache_logs();
     if (kv_result.key == "EOF"){
       scan_complete = 1;
     }
@@ -256,6 +263,6 @@ void push_kv_pair_to_hash(KVPAIR key_value, VALUE token_hash) {
   }
 }
 
-void Init_tokenize_apache_logs() {
-  rb_define_method(rb_cString, "tokenize_apache_logs", t_tokenize_apache_logs, 0);
+void Init_scan_apache_logs() {
+  rb_define_method(rb_cString, "scan_apache_logs", t_scan_apache_logs, 0);
 }

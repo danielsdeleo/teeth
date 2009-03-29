@@ -1,25 +1,48 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-
+require "fileutils"
+include FileUtils
 describe Scanner do
+  TEST_EXT_DIR = File.dirname(__FILE__) + "/test_ext_dir"
   
 IPV4_ACTION_TEXT = 
 %q|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT} {
   KVPAIR ipv4_addr = {"ipv4_addr", yytext};
   return ipv4_addr;
 }
-|
+| 
+  
+  def clean_test_scanner_dir
+    rm_rf TEST_EXT_DIR
+  end
+  
+  before(:all) do
+    clean_test_scanner_dir
+  end
   
   before(:each) do
     @scanner = Scanner.new(:rspec_awesome)
   end
   
-  it "should create a new directory and extconf.rb file"
+  after(:all) do
+    clean_test_scanner_dir
+  end
+  
+  it "should generate the code for an extconf file" do
+    expected = 'require "mkmf"' + "\n" + '$CFLAGS += " -Wall"' + "\n" +
+    'create_makefile "teeth/scan_rspec_awesome", "./"' + "\n"
+    @scanner.extconf.should == expected
+  end
+  
+  it "should create a new directory for the extension" do
+    scanner = Scanner.new(:rspec_awesomeness, TEST_EXT_DIR)
+    File.exist?(TEST_EXT_DIR).should be_true
+  end
   
   it "should initialize with a name for for the tokenizer function and method" do
     scanner = Scanner.new(:rails_dev_logs)
-    scanner.scanner_name.should == "teeth_scan_rails_dev_logs"
-    scanner.main_function_name.should == "t_teeth_scan_rails_dev_logs"
-    scanner.init_function_name.should == "Init_teeth_scan_rails_dev_logs"
+    scanner.scanner_name.should == "scan_rails_dev_logs"
+    scanner.main_function_name.should == "t_scan_rails_dev_logs"
+    scanner.init_function_name.should == "Init_scan_rails_dev_logs"
     scanner.function_prefix.should == "rails_dev_logs_yy"
     scanner.entry_point.should == "scan_rails_dev_logs"
   end
@@ -134,8 +157,20 @@ IPV4_ACTION_TEXT =
       rule.relative_url '{REL_URL}'
     end
     result = @scanner.generate
-    puts result
-    pending("should == ...")
+    # real test is if scanner compiles and passes its own tests
+    result.should_not match(Regexp.new(Regexp.quote '<%='))
+  end
+  
+  it "should write the scanner and extconf files in the ext directory" do
+    scanner = Scanner.new(:rspec_awesomeness, TEST_EXT_DIR)
+    scanner.load_default_definitions_for(:whitespace, :ip, :web)
+    scanner.rules do |rule|
+      rule.ipv4_addr '{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}'
+      rule.relative_url '{REL_URL}'
+    end
+    scanner.write!
+    File.exist?(TEST_EXT_DIR + "/extconf.rb").should be_true
+    File.exist?(TEST_EXT_DIR + "/scan_rspec_awesomeness.yy").should be_true
   end
   
 end

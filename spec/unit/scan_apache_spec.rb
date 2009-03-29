@@ -1,15 +1,16 @@
 require File.dirname(__FILE__) + '/../spec_helper'
+require "teeth/scan_apache_logs"
 $INCLUDE_SLOW_TESTS = true
 
 describe "Apache Lexer Extension", "when lexing apache errors" do
 
   before(:each) do
     str = "[Sun Nov 30 14:23:45 2008] [error] [client 10.0.1.197] Invalid URI in request GET .\\.\\.\\.\\.\\.\\.\\.\\.\\.\\/winnt/win.ini HTTP/1.1"
-    @tokens = str.tokenize_apache_logs
+    @tokens = str.scan_apache_logs
   end
   
   it "should return an uuid and empty message for an empty string" do
-    tokens = "".tokenize_apache_logs
+    tokens = "".scan_apache_logs
     tokens[:message].should == ""
     tokens[:id].should match(/[0-9A-F]{32}/)
   end
@@ -36,7 +37,7 @@ describe "Apache Lexer Extension", "when lexing apache errors" do
   
   it "should error out if the string is longer than 1M chars" do
     str = ((("abcDE" * 2) * 1000) * 100) + "X"
-    lambda {str.tokenize_apache_logs}.should raise_error(ArgumentError, "string too long for tokenize_apache_logs! max length is 1,000,000 chars")
+    lambda {str.scan_apache_logs}.should raise_error(ArgumentError, "string too long for scan_apache_logs! max length is 1,000,000 chars")
   end
   
 end
@@ -44,19 +45,19 @@ end
 describe "Apache Lexer Extension", "when lexing apache access logs" do
   before(:each) do
     str = %q{couchdb.localdomain:80 172.16.115.1 - - [13/Dec/2008:19:26:11 -0500] "GET /favicon.ico HTTP/1.1" 404 241 "http://172.16.115.130/" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1"}
-    @tokens = str.tokenize_apache_logs
+    @tokens = str.scan_apache_logs
     str2 = %q{127.162.219.29 - - [14/Jan/2009:15:32:32 -0500] "GET /reports//ee_commerce/paypalcart.php?toroot=http://www.shenlishi.com//skin/fxid1.txt?? HTTP/1.1" 404 5636}
-    @tokens2 = str2.tokenize_apache_logs
+    @tokens2 = str2.scan_apache_logs
     str3 = %q{127.81.248.53 - - [14/Jan/2009:11:49:43 -0500] "GET /reports/REPORT7_1ART02.pdf HTTP/1.1" 206 255404}
-    @tokens3 = str3.tokenize_apache_logs
+    @tokens3 = str3.scan_apache_logs
     str4 = %q{127.140.136.56 - - [23/Jan/2009:12:59:24 -0500] "GET /scripts/..%255c%255c../winnt/system32/cmd.exe?/c+dir" 404 5607}
-    @tokens4 = str4.tokenize_apache_logs
+    @tokens4 = str4.scan_apache_logs
     str5 = %q{127.254.43.205 - - [26/Jan/2009:08:32:08 -0500] "GET /reports/REPORT9_3.pdf//admin/includes/footer.php?admin_template_default=../../../../../../../../../../../../../etc/passwd%00 HTTP/1.1" 404 5673}
-    @tokens5 = str5.tokenize_apache_logs
+    @tokens5 = str5.scan_apache_logs
     str6 = %q{127.218.234.82 - - [26/Jan/2009:08:32:19 -0500] "GET /reports/REPORT9_3.pdf//admin/includes/header.php?bypass_installed=1&bypass_restrict=1&row_secure[account_theme]=../../../../../../../../../../../../../etc/passwd%00 HTTP/1.1" 404 5721}
-    @tokens6 = str6.tokenize_apache_logs
+    @tokens6 = str6.scan_apache_logs
     str_naked_url = %q{127.218.234.82 - - [26/Jan/2009:08:32:19 -0500] "GET / HTTP/1.1" 404 5721}
-    @tokens_naked_url = str_naked_url.tokenize_apache_logs
+    @tokens_naked_url = str_naked_url.scan_apache_logs
   end
   
   it "provides hints for testing" do
@@ -78,7 +79,7 @@ describe "Apache Lexer Extension", "when lexing apache access logs" do
     (300 .. 305).map { |n| n.to_s } + ['307'] + (400 .. 417).map { |n| n.to_s } +
     (500 .. 505).map { |n| n.to_s }
     codes.each do |code|
-      code.tokenize_apache_logs[:http_response].first.should == code
+      code.scan_apache_logs[:http_response].first.should == code
     end
   end
   
