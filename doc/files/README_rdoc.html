@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Sun Mar 29 17:25:34 -0600 2009</td>
+      <td>Sun Mar 29 17:53:10 -0600 2009</td>
     </tr>
     </table>
   </div>
@@ -125,78 +125,120 @@ Here&#8216;s an example based on the definition for the Rails log scanner:
 <pre>
         require File.dirname(__FILE__) + &quot;/../lib/teeth&quot;
         scanner = Teeth::Scanner.new(:rails_logs, File.dirname(__FILE__) + '/../ext/scan_rails_logs/')
-
-        # Flex definitions are kinda like macros for regular expressions.
-        # We include some of the included defaults here to make writing
-        # the scanner easier
+</pre>
+<p>
+Flex definitions are kinda like macros for regular expressions. We include
+some of the available defaults here to make writing the scanner easier
+</p>
+<pre>
         scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
-
-        # Add some more definitions
+</pre>
+<p>
+Add some more definitions
+</p>
+<pre>
         scanner.definitions do |define|
-          define.RAILS_TEASER '(processing|filter\ chain\ halted|rendered)'
-          define.CONTROLLER_ACTION '[a-z0-9]+#[a-z0-9]+'
-
-                # Scanner is case insensitive
+                define.RAILS_TEASER '(processing|filter\ chain\ halted|rendered)'
+                define.CONTROLLER_ACTION '[a-z0-9]+#[a-z0-9]+'
+</pre>
+<p>
+Scanner is case insensitive
+</p>
+<pre>
                 define.RAILS_ERROR_CLASS '([a-z]+\:\:)*[a-z]+error'
-
-                # &quot;start conditions&quot; are a feature of flex that allows
-                # us to have some regular expressions that are only active
-                # when we tell the scanner to enter a certain state.  Here
-                # we define the ``REQUEST_COMPLETED'' state, and specify
-                # that it is exclusive.  This means that if the scanner is
-                # in this state, it only matches rules written for this state
+</pre>
+<p>
+&quot;start conditions&quot; are a feature of flex that allows us to have
+some regular expressions that are only active when we tell the scanner to
+enter a certain state. Here we define the ``REQUEST_COMPLETED&#8217;&#8217;
+state, and specify that it is exclusive. This means that if the scanner is
+in this state, it only matches rules written for this state
+</p>
+<pre>
                 define.REQUEST_COMPLETED :start_condition =&gt; :exclusive
-
         end
-
-        # Define rules.  These are the actions that the scanner executes when
-        # it sees text that matches a regular expression.  The default action
-        # is to add :action_name =&gt; [matched_text] to the results Hash, or push
-        # the matched text on the end of the array if it already exists.
+</pre>
+<p>
+Define rules. These are the actions that the scanner executes when it sees
+text that matches a regular expression. The default action is to add
+:action_name =&gt; [matched_text] to the results Hash, or push the matched
+text on the end of the array if it already exists.
+</p>
+<pre>
         scanner.rules do |r|
-
-                # will add something like :teaser =&gt; [&quot;Processing&quot;] to the results
-          r.teaser '{RAILS_TEASER}'
-          r.controller_action '{CONTROLLER_ACTION}'
-
-                # Use some of the default definitions we added above.
-          r.datetime '{YEAR}&quot;-&quot;{MONTH_NUM}&quot;-&quot;{MDAY}{WS}{HOUR}&quot;:&quot;{MINSEC}&quot;:&quot;{MINSEC}'
-          r.http_method '{HTTP_VERB}'
-
-                # With :skip_line =&gt; true, scanner stops processing the line immediately
-          r.skip_lines '{RAILS_SKIP_LINES}', :skip_line =&gt; true
-
+</pre>
+<p>
+This will add something like :teaser =&gt; [&quot;Processing&quot;] to the
+results
+</p>
+<pre>
+                r.teaser '{RAILS_TEASER}'
+                r.controller_action '{CONTROLLER_ACTION}'
+</pre>
+<p>
+Use some of the default definitions we added above.
+</p>
+<pre>
+                r.datetime '{YEAR}&quot;-&quot;{MONTH_NUM}&quot;-&quot;{MDAY}{WS}{HOUR}&quot;:&quot;{MINSEC}&quot;:&quot;{MINSEC}'
+                r.http_method '{HTTP_VERB}'
+</pre>
+<p>
+With :skip_line =&gt; true, scanner stops processing the line immediately
+</p>
+<pre>
+                r.skip_lines '{RAILS_SKIP_LINES}', :skip_line =&gt; true
           r.error '{RAILS_ERROR_CLASS}'
-
-                # with :strip_ends =&gt; true, scanner removes first and last characters from matched text
-          r.error_message '\(({WS}|{NON_WS})+\)', :strip_ends =&gt; true
-
-                # Puts scanner in the ``REQUEST_COMPLETED'' state we defined above.
-                # The scanner only matches rules beginning with ``&lt;REQUEST_COMPLETED&gt;''
-                # now
-          r.teaser 'completed\ in', :begin =&gt; &quot;REQUEST_COMPLETED&quot;
-
-                # These rules only apply to the ``REQUEST_COMPLETED'' State
+</pre>
+<p>
+with :strip_ends =&gt; true, scanner removes first and last characters from
+matched text
+</p>
+<pre>
+                r.error_message '\(({WS}|{NON_WS})+\)', :strip_ends =&gt; true
+</pre>
+<p>
+Puts scanner in the ``REQUEST_COMPLETED&#8217;&#8217; state we defined
+above. The scanner only matches rules beginning with
+``&lt;REQUEST_COMPLETED&gt;&#8217;&#8217; now
+</p>
+<pre>
+                r.teaser 'completed\ in', :begin =&gt; &quot;REQUEST_COMPLETED&quot;
+</pre>
+<p>
+These rules only apply to the ``REQUEST_COMPLETED&#8217;&#8217; State
+</p>
+<pre>
                 r.duration_s '&lt;REQUEST_COMPLETED&gt;[0-9]+\.[0-9]+'
-          r.duration_ms '&lt;REQUEST_COMPLETED&gt;[0-9]+/ms'
-          r.http_response '&lt;REQUEST_COMPLETED&gt;{HTTPCODE}'
-
-                # Need a &quot;catchall&quot; rule -- flex scanner &quot;jams&quot; if there isn't a default rule (the
-                # catchall rule for the default/INITIAL state is automatically included).
-                # note that :ignore =&gt; true makes the scanner ignore what it matches but doesn't
-                # stop processing of the line.
-          r.ignore_others '&lt;REQUEST_COMPLETED&gt;{CATCHALL}', :ignore =&gt; true
-
-                # The &quot;strings&quot; action is special.  It keeps track of whether the last token
-                # was also a string, and if it was, the new string is appended to the
-                # last string instead of being pushed to the array.  For example, when scanning
-                # an apache error log, ``Invalid URI in request'' will be extracted as a complete
-                # string (instead of [&quot;Invalid&quot;, &quot;URI&quot;, &quot;in&quot;, &quot;request&quot;])
-          r.strings '{NON_WS}{NON_WS}*'
+                r.duration_ms '&lt;REQUEST_COMPLETED&gt;[0-9]+/ms'
+                r.http_response '&lt;REQUEST_COMPLETED&gt;{HTTPCODE}'
+</pre>
+<p>
+Need a &quot;catchall&quot; rule &#8212; flex scanner &quot;jams&quot; if
+there isn&#8216;t a default rule (the catchall rule for the default/INITIAL
+state is automatically included). note that :ignore =&gt; true makes the
+scanner ignore what it matches but doesn&#8216;t stop processing of the
+line.
+</p>
+<pre>
+                r.ignore_others '&lt;REQUEST_COMPLETED&gt;{CATCHALL}', :ignore =&gt; true
+</pre>
+<p>
+The &quot;strings&quot; action is special. It keeps track of whether the
+last token was also a string, and if it was, the new string is appended to
+the last string instead of being pushed to the array. For example, when
+scanning an apache error log, ``Invalid URI in request&#8217;&#8217; will
+be extracted as a complete string (instead of [&quot;Invalid&quot;,
+&quot;URI&quot;, &quot;in&quot;, &quot;request&quot;])
+</p>
+<pre>
+                r.strings '{NON_WS}{NON_WS}*'
         end
-
-        # Writes the generated scanner and an extconf.rb for it to the directory
-        # we specified when we initialized the scanner.
+</pre>
+<p>
+Writes the generated scanner and an extconf.rb for it to the directory we
+specified when we initialized the scanner.
+</p>
+<pre>
         scanner.write!
 </pre>
 <p>

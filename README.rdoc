@@ -33,82 +33,81 @@ Here's an example based on the definition for the Rails log scanner:
 	require File.dirname(__FILE__) + "/../lib/teeth"
 	scanner = Teeth::Scanner.new(:rails_logs, File.dirname(__FILE__) + '/../ext/scan_rails_logs/')
 	
-	# Flex definitions are kinda like macros for regular expressions.
-	# We include some of the included defaults here to make writing 
-	# the scanner easier
+Flex definitions are kinda like macros for regular expressions.
+We include some of the available defaults here to make writing 
+the scanner easier
+	
 	scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
 	
-	# Add some more definitions
+Add some more definitions
 	scanner.definitions do |define|
-	  define.RAILS_TEASER '(processing|filter\ chain\ halted|rendered)'
-	  define.CONTROLLER_ACTION '[a-z0-9]+#[a-z0-9]+'
+		define.RAILS_TEASER '(processing|filter\ chain\ halted|rendered)'
+		define.CONTROLLER_ACTION '[a-z0-9]+#[a-z0-9]+'
 		
-		# Scanner is case insensitive
+Scanner is case insensitive
 		define.RAILS_ERROR_CLASS '([a-z]+\:\:)*[a-z]+error'
 	  
-		# "start conditions" are a feature of flex that allows
-		# us to have some regular expressions that are only active
-		# when we tell the scanner to enter a certain state.  Here
-		# we define the ``REQUEST_COMPLETED'' state, and specify
-		# that it is exclusive.  This means that if the scanner is
-		# in this state, it only matches rules written for this state
+"start conditions" are a feature of flex that allows
+us to have some regular expressions that are only active
+when we tell the scanner to enter a certain state.  Here
+we define the ``REQUEST_COMPLETED'' state, and specify
+that it is exclusive.  This means that if the scanner is
+in this state, it only matches rules written for this state
 		define.REQUEST_COMPLETED :start_condition => :exclusive
-	
 	end
 	
-	# Define rules.  These are the actions that the scanner executes when
-	# it sees text that matches a regular expression.  The default action
-	# is to add :action_name => [matched_text] to the results Hash, or push
-	# the matched text on the end of the array if it already exists.
+Define rules.  These are the actions that the scanner executes when
+it sees text that matches a regular expression.  The default action
+is to add :action_name => [matched_text] to the results Hash, or push
+the matched text on the end of the array if it already exists.
 	scanner.rules do |r|
 		
-		# will add something like :teaser => ["Processing"] to the results
-	  r.teaser '{RAILS_TEASER}'
-	  r.controller_action '{CONTROLLER_ACTION}'
+This will add something like :teaser => ["Processing"] to the results
+		r.teaser '{RAILS_TEASER}'
+		r.controller_action '{CONTROLLER_ACTION}'
 		
-		# Use some of the default definitions we added above.
-	  r.datetime '{YEAR}"-"{MONTH_NUM}"-"{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC}'
-	  r.http_method '{HTTP_VERB}'
+Use some of the default definitions we added above.
+		r.datetime '{YEAR}"-"{MONTH_NUM}"-"{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC}'
+		r.http_method '{HTTP_VERB}'
 		
-		# With :skip_line => true, scanner stops processing the line immediately
-	  r.skip_lines '{RAILS_SKIP_LINES}', :skip_line => true
-		
+With :skip_line => true, scanner stops processing the line immediately
+		r.skip_lines '{RAILS_SKIP_LINES}', :skip_line => true
 	  r.error '{RAILS_ERROR_CLASS}'
 		
-		# with :strip_ends => true, scanner removes first and last characters from matched text
-	  r.error_message '\(({WS}|{NON_WS})+\)', :strip_ends => true
+with :strip_ends => true, scanner removes first and last characters from matched text
+		r.error_message '\(({WS}|{NON_WS})+\)', :strip_ends => true
 		
-		# Puts scanner in the ``REQUEST_COMPLETED'' state we defined above.
-		# The scanner only matches rules beginning with ``<REQUEST_COMPLETED>''
-		# now
-	  r.teaser 'completed\ in', :begin => "REQUEST_COMPLETED"
+Puts scanner in the ``REQUEST_COMPLETED'' state we defined above.
+The scanner only matches rules beginning with ``<REQUEST_COMPLETED>''
+now
+		r.teaser 'completed\ in', :begin => "REQUEST_COMPLETED"
 	  
-		# These rules only apply to the ``REQUEST_COMPLETED'' State
+These rules only apply to the ``REQUEST_COMPLETED'' State
 		r.duration_s '<REQUEST_COMPLETED>[0-9]+\.[0-9]+'
-	  r.duration_ms '<REQUEST_COMPLETED>[0-9]+/ms'
-	  r.http_response '<REQUEST_COMPLETED>{HTTPCODE}'
+		r.duration_ms '<REQUEST_COMPLETED>[0-9]+/ms'
+		r.http_response '<REQUEST_COMPLETED>{HTTPCODE}'
 		
-		# Need a "catchall" rule -- flex scanner "jams" if there isn't a default rule (the
-		# catchall rule for the default/INITIAL state is automatically included).
-		# note that :ignore => true makes the scanner ignore what it matches but doesn't
-		# stop processing of the line.
-	  r.ignore_others '<REQUEST_COMPLETED>{CATCHALL}', :ignore => true
+Need a "catchall" rule -- flex scanner "jams" if there isn't a default rule (the
+catchall rule for the default/INITIAL state is automatically included).
+note that :ignore => true makes the scanner ignore what it matches but doesn't
+stop processing of the line.
+		r.ignore_others '<REQUEST_COMPLETED>{CATCHALL}', :ignore => true
 	  
-		# The "strings" action is special.  It keeps track of whether the last token 
-		# was also a string, and if it was, the new string is appended to the 
-		# last string instead of being pushed to the array.  For example, when scanning
-		# an apache error log, ``Invalid URI in request'' will be extracted as a complete
-		# string (instead of ["Invalid", "URI", "in", "request"])
-	  r.strings '{NON_WS}{NON_WS}*'
+The "strings" action is special.  It keeps track of whether the last token 
+was also a string, and if it was, the new string is appended to the 
+last string instead of being pushed to the array.  For example, when scanning
+an apache error log, ``Invalid URI in request'' will be extracted as a complete
+string (instead of ["Invalid", "URI", "in", "request"])
+		r.strings '{NON_WS}{NON_WS}*'
 	end
 	
-	# Writes the generated scanner and an extconf.rb for it to the directory
-	# we specified when we initialized the scanner.
+Writes the generated scanner and an extconf.rb for it to the directory
+we specified when we initialized the scanner.
 	scanner.write!
 	
-There's much in the way of documentation for the scanner generator, but you can 
+There's not much in the way of documentation for the scanner generator, but you can 
 refer to the specs and the definitions for Apache and Rails logs to get a sense
-of how it works.  It would probably help a lot to learn about flex's regex syntax
+of how it works.  It would probably help to learn about flex's regex syntax
 and other features.
 
 = Ruby 1.9

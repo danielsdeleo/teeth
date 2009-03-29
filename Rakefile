@@ -41,38 +41,7 @@ begin
     s.extensions = ["ext/scan_apache_logs/extconf.rb", "ext/scan_rails_logs/extconf.rb"]
 
     # ruby -rpp -e' pp `git ls-files`.split("\n") '
-    s.files = ["LICENSE",
-     "README.rdoc",
-     "Rakefile",
-     "VERSION.yml",
-     "ext/scan_apache_logs/Makefile",
-     "ext/scan_apache_logs/extconf.rb",
-     "ext/scan_apache_logs/scan_apache_logs.yy",
-     "ext/scan_apache_logs/scan_apache_logs.yy.c",
-     "ext/scan_rails_logs/Makefile",
-     "ext/scan_rails_logs/extconf.rb",
-     "ext/scan_rails_logs/scan_rails_logs.yy",
-     "ext/scan_rails_logs/scan_rails_logs.yy.c",
-     "lib/rule_statement.rb",
-     "lib/scanner.rb",
-     "lib/scanner_definition.rb",
-     "lib/teeth.rb",
-     "scanners/scan_apache_logs.rb",
-     "scanners/scan_rails_logs.rb",
-     "spec/fixtures/rails_1x.log",
-     "spec/fixtures/rails_22.log",
-     "spec/fixtures/rails_22_cached.log",
-     "spec/fixtures/rails_unordered.log",
-     "spec/playground/show_apache_processing.rb",
-     "spec/spec.opts",
-     "spec/spec_helper.rb",
-     "spec/unit/rule_statement_spec.rb",
-     "spec/unit/scan_apache_spec.rb",
-     "spec/unit/scan_rails_logs_spec.rb",
-     "spec/unit/scaner_definition_spec.rb",
-     "spec/unit/scanner_spec.rb",
-     "teeth.gemspec",
-     "templates/tokenizer.yy.erb"]
+    s.files = `git ls-files`.split("\n").reject {|f| f =~ /git/}
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
