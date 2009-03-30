@@ -1,4 +1,5 @@
 require "teeth/scan_apache_logs"
+require "teeth/scan_rails_logs"
 $:.unshift File.dirname(__FILE__) + "/"
 require "scanner"
 require "scanner_definition"
