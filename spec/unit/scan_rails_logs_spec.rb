@@ -34,7 +34,6 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   it "should extract the duration, view duration, db duration, HTTP status code, and url from a ``Completed'' line for Rails 1.x" do
     rails_1x = %q{Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]}
     result = rails_1x.scan_rails_logs
-    puts "\n==completed (1.x): " + result.inspect
     result[:teaser].first.should == "Completed in"
     result[:duration_s].first.should == "0.21665"
     result[:view_s].first.should == "0.00926"
@@ -43,10 +42,21 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
     result[:url].first.should == "http://demo.nu/employees"
   end
   
+  it "should also process a different 1.x ``Completed'' line correctly" do
+    alt_1x = %q{Completed in 0.04180 (23 reqs/sec) | Rendering: 0.02667 (63%) | DB: 0.00259 (6%) | 200 OK [http://localhost/]}
+    result = alt_1x.scan_rails_logs
+    puts result.inspect
+    result[:teaser].first.should == "Completed in"
+    result[:duration_s].first.should == "0.04180"
+    result[:view_s].first.should == "0.02667"
+    result[:db_s].first.should == "0.00259"
+    result[:http_response].first.should == "200"
+    result[:url].first.should == "http://localhost/"    
+  end
+  
   it "should extract the relevant components from a ``Completed'' line for Rails 2.x" do
     rails_2x =  %q{Completed in 614ms (View: 120, DB: 31) | 200 OK [http://floorplanner.local/demo]}
     result = rails_2x.scan_rails_logs
-    puts "\n==completed (2.x): " + result.inspect
     result[:teaser].first.should == "Completed in"
     result[:duration_ms].first.should == "614"
     result[:view_ms].first.should == "120"

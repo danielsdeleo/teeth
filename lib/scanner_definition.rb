@@ -60,7 +60,7 @@ module Teeth
     DEFAULT_DEFINITIONS[:whitespace] = [["WS",  '[[:space:]]'],
                                         ["NON_WS", "([a-z]|[0-9]|[:punct:])"]]
     DEFAULT_DEFINITIONS[:ip]    = [ ["IP4_OCT", "[0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]"],
-                                    ["HOST", '[a-z0-9][a-z0-9\-]*\.[a-z0-9][a-z0-9\-]*.[a-z0-9][a-z0-9\-\.]*[a-z]+(\:[0-9]+)?']]
+                                    ["HOST", '([a-z0-9][a-z0-9\-]*\.[a-z0-9][a-z0-9\-]*.[a-z0-9][a-z0-9\-\.]*[a-z]+(\:[0-9]+)?)|localhost']]
     DEFAULT_DEFINITIONS[:time]  = [ ["WDAY", "mon|tue|wed|thu|fri|sat|sun"],
                                     ["MON", "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"],
                                     ["MONTH_NUM", "0[1-9]|1[0-2]"],

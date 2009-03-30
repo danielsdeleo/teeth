@@ -59,7 +59,7 @@ scanner.rules do |r|
   r.db_s '<COMPLETED_REQ_DB_STATS>[0-9]+\.[0-9]+', :begin => "REQUEST_COMPLETED"
   r.db_ms '<COMPLETED_REQ_DB_STATS>[0-9]+', :begin => "REQUEST_COMPLETED"
   r.db_throwaway_tokens '<COMPLETED_REQ_DB_STATS>{CATCHALL}', :ignore => true
-  r.url '<REQUEST_COMPLETED>\[{PROTO}"\/\/"({HOST}|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT})({REL_URL}|"\/")?\]', :strip_ends => true
+  r.url '<REQUEST_COMPLETED>\[{PROTO}"\/\/"({HOST}|({IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}))({REL_URL}|"/"|"\\\\")?\]', :strip_ends => true
   r.http_response '<REQUEST_COMPLETED>{HTTPCODE}'
   r.strings '<REQUEST_COMPLETED>{NON_WS}{NON_WS}*'
   r.ignore_others '<REQUEST_COMPLETED>{CATCHALL}', :ignore => true

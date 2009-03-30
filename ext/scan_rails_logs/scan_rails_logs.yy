@@ -44,7 +44,7 @@ NON_WS ([a-z]|[0-9]|[:punct:])
 
 IP4_OCT [0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]
 
-HOST [a-z0-9][a-z0-9\-]*\.[a-z0-9][a-z0-9\-]*.[a-z0-9][a-z0-9\-\.]*[a-z]+(\:[0-9]+)?
+HOST ([a-z0-9][a-z0-9\-]*\.[a-z0-9][a-z0-9\-]*.[a-z0-9][a-z0-9\-\.]*[a-z]+(\:[0-9]+)?)|localhost
 
 WDAY mon|tue|wed|thu|fri|sat|sun
 
@@ -231,7 +231,7 @@ completed\ in {
 
 <COMPLETED_REQ_DB_STATS>{CATCHALL}
 
-<REQUEST_COMPLETED>\[{PROTO}"\/\/"({HOST}|{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT})({REL_URL}|"\/")?\] {
+<REQUEST_COMPLETED>\[{PROTO}"\/\/"({HOST}|({IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}))({REL_URL}|"/"|"\\")?\] {
   KVPAIR url = {"url", strip_ends(yytext)};
   return url;
 }
