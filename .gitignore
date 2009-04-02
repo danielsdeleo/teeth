@@ -1,6 +1,6 @@
 *.o
 *.bundle
 *.so
-ext/Makefile
+ext/*/Makefile
 .DS*
 *.tch
