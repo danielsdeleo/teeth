@@ -37,7 +37,9 @@ module Teeth
     end
     
     def extconf
-      'require "mkmf"' + "\n" + '$CFLAGS += " -Wall"' + "\n" + "create_makefile " +
+      'require "mkmf"' + "\n" + '$CFLAGS += " -Wall"' + "\n" + 
+      'have_library("uuid", "uuid_generate_time")' + "\n" +
+      "create_makefile " +
       %Q|"teeth/#{scanner_name}", "./"\n| 
     end
     
