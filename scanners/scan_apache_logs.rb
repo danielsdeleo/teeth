@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/../lib/teeth"
+require File.expand_path(File.dirname(__FILE__) + "/../lib/teeth")
 scanner = Teeth::Scanner.new(:apache_logs, File.dirname(__FILE__) + '/../ext/scan_apache_logs/')
 scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
 scanner.rdoc = <<-RDOC
