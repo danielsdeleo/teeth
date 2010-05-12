@@ -2,6 +2,8 @@
 *.bundle
 *.so
 ext/*/Makefile
+ext/*/mkmf.log
 .DS*
 *.tch
 .rake_tasks~
+pkg/*
