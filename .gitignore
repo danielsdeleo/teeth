@@ -4,3 +4,4 @@
 ext/*/Makefile
 .DS*
 *.tch
+.rake_tasks~
