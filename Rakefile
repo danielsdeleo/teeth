@@ -102,3 +102,9 @@ namespace :ext do
   
     
 end
+
+desc "deletes generated gem"
+task :clobber_gem do
+  FileList['pkg/*gem'].each { |gemfile| rm gemfile }
+end
+task :clobber => :clobber_gem
