@@ -69,13 +69,14 @@ module Teeth
                                     ["MINSEC", "[0-5][0-9]|60"],
                                     ["YEAR", "[0-9][0-9][0-9][0-9]"],
                                     ["PLUSMINUS", '(\+|\-)']]
-    DEFAULT_DEFINITIONS[:web]   = [ ["REL_URL", %q{(\/|\\\\|\.)[a-z0-9\._\~\-\/\?&;#=\%\:\+\[\]\\\\]*}],
+    DEFAULT_DEFINITIONS[:web]   = [ ["TIMING", %q{[0-9]+\.[0-9]+}],
+                                    ["REL_URL", %q{(\/|\\\\|\.)[a-z0-9\._\~\-\/\?&;#=\%\:\+\[\]\\\\]*}],
                                     ["PROTO", "(http:|https:)"],
                                     ["ERR_LVL", "(emerg|alert|crit|err|error|warn|warning|notice|info|debug)"],
                                     ["HTTP_VERS", 'HTTP\/(1.0|1.1)'],
                                     ["HTTP_VERB", "(get|head|put|post|delete|trace|connect)"],
                                     ["HTTPCODE", "(100|101|20[0-6]|30[0-5]|307|40[0-9]|41[0-7]|50[0-5])"],
-                                    ["BROWSER_STR", '\"(moz|msie|lynx).+\"']]
+                                    ["BROWSER_STR", '\"(moz|msie|lynx|reconnoiter|pingdom)[^"]+\"']]
 
     def add(name, regex, options={})
       assert_defn_has_unique_name(name)

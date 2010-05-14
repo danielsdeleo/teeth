@@ -172,7 +172,12 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-extern int rails_logs_yyleng;
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
+extern yy_size_t rails_logs_yyleng;
 
 extern FILE *rails_logs_yyin, *rails_logs_yyout;
 
@@ -198,11 +203,6 @@ extern FILE *rails_logs_yyin, *rails_logs_yyout;
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
 
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
-
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
@@ -220,7 +220,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -290,8 +290,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when rails_logs_yytext is formed. */
 static char yy_hold_char;
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int rails_logs_yyleng;
+static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
+yy_size_t rails_logs_yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -319,7 +319,7 @@ static void rails_logs_yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE rails_logs_yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE rails_logs_yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE rails_logs_yy_scan_bytes (yyconst char *bytes,int len  );
+YY_BUFFER_STATE rails_logs_yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
 
 void *rails_logs_yyalloc (yy_size_t  );
 void *rails_logs_yyrealloc (void *,yy_size_t  );
@@ -9967,7 +9967,7 @@ FILE *rails_logs_yyget_out (void );
 
 void rails_logs_yyset_out  (FILE * out_str  );
 
-int rails_logs_yyget_leng (void );
+yy_size_t rails_logs_yyget_leng (void );
 
 char *rails_logs_yyget_text (void );
 
@@ -10095,7 +10095,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 98 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 100 "ext/scan_rails_logs/scan_rails_logs.yy"
 
   /* 
     Actions 
@@ -10176,7 +10176,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 104 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 106 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR teaser = {"teaser", rails_logs_yytext};
   return teaser;
@@ -10184,7 +10184,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 109 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 111 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR controller_action = {"controller_action", rails_logs_yytext};
   return controller_action;
@@ -10192,7 +10192,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 114 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 116 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR ipv4_addr = {"ipv4_addr", rails_logs_yytext};
   return ipv4_addr;
@@ -10201,7 +10201,7 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 119 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 121 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR datetime = {"datetime", rails_logs_yytext};
   return datetime;
@@ -10209,7 +10209,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 124 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 126 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR http_method = {"http_method", rails_logs_yytext};
   return http_method;
@@ -10217,14 +10217,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 129 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 131 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   return EOF_KVPAIR;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 133 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 135 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR end_session_id = {"end_session_id", rails_logs_yytext};
   return end_session_id;
@@ -10232,7 +10232,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 138 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 140 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR error = {"error", rails_logs_yytext};
   return error;
@@ -10241,7 +10241,7 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 143 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 145 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR error_message = {"error_message", strip_ends(rails_logs_yytext)};
   return error_message;
@@ -10250,7 +10250,7 @@ YY_RULE_SETUP
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 148 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 150 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR line_number = {"line_number", strip_ends(rails_logs_yytext)};
   return line_number;
@@ -10259,7 +10259,7 @@ YY_RULE_SETUP
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 153 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 155 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR file_and_line = {"file_and_line", strip_ends(rails_logs_yytext)};
   return file_and_line;
@@ -10267,7 +10267,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 158 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 160 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR cache_hit = {"cache_hit", rails_logs_yytext};
   return cache_hit;
@@ -10278,7 +10278,7 @@ case 13:
 (yy_c_buf_p) = yy_cp -= 2;
 YY_DO_BEFORE_ACTION; /* set up rails_logs_yytext again */
 YY_RULE_SETUP
-#line 163 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 165 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR partial = {"partial", rails_logs_yytext};
   return partial;
@@ -10289,7 +10289,7 @@ case 14:
 (yy_c_buf_p) = yy_cp -= 3;
 YY_DO_BEFORE_ACTION; /* set up rails_logs_yytext again */
 YY_RULE_SETUP
-#line 168 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 170 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR render_duration_ms = {"render_duration_ms", rails_logs_yytext};
   return render_duration_ms;
@@ -10297,7 +10297,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 173 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 175 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR render_duration_s = {"render_duration_s", strip_ends(rails_logs_yytext)};
   return render_duration_s;
@@ -10305,7 +10305,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 178 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 180 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(REQUEST_COMPLETED);
   KVPAIR teaser = {"teaser", rails_logs_yytext};
@@ -10314,7 +10314,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 184 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 186 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR duration_s = {"duration_s", rails_logs_yytext};
   return duration_s;
@@ -10325,7 +10325,7 @@ case 18:
 (yy_c_buf_p) = yy_cp -= 2;
 YY_DO_BEFORE_ACTION; /* set up rails_logs_yytext again */
 YY_RULE_SETUP
-#line 189 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 191 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR duration_ms = {"duration_ms", rails_logs_yytext};
   return duration_ms;
@@ -10333,7 +10333,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 194 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 196 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(COMPLETED_REQ_VIEW_STATS);
   KVPAIR start_view_stats = {"start_view_stats", rails_logs_yytext};
@@ -10342,7 +10342,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 200 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 202 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(REQUEST_COMPLETED);
   KVPAIR view_s = {"view_s", rails_logs_yytext};
@@ -10351,7 +10351,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 206 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 208 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(REQUEST_COMPLETED);
   KVPAIR view_ms = {"view_ms", rails_logs_yytext};
@@ -10361,12 +10361,12 @@ YY_RULE_SETUP
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 212 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 214 "ext/scan_rails_logs/scan_rails_logs.yy"
 
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 214 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 216 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(COMPLETED_REQ_DB_STATS);
   KVPAIR start_db_stats = {"start_db_stats", rails_logs_yytext};
@@ -10375,7 +10375,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 220 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 222 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(REQUEST_COMPLETED);
   KVPAIR db_s = {"db_s", rails_logs_yytext};
@@ -10384,7 +10384,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 226 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 228 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   BEGIN(REQUEST_COMPLETED);
   KVPAIR db_ms = {"db_ms", rails_logs_yytext};
@@ -10394,12 +10394,12 @@ YY_RULE_SETUP
 case 26:
 /* rule 26 can match eol */
 YY_RULE_SETUP
-#line 232 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 234 "ext/scan_rails_logs/scan_rails_logs.yy"
 
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 234 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 236 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR url = {"url", strip_ends(rails_logs_yytext)};
   return url;
@@ -10407,7 +10407,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 239 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 241 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR http_response = {"http_response", rails_logs_yytext};
   return http_response;
@@ -10415,7 +10415,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 244 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 246 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR strings = {"strings", rails_logs_yytext};
   return strings;
@@ -10424,12 +10424,12 @@ YY_RULE_SETUP
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 249 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 251 "ext/scan_rails_logs/scan_rails_logs.yy"
 
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 251 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 253 "ext/scan_rails_logs/scan_rails_logs.yy"
 {
   KVPAIR strings = {"strings", rails_logs_yytext};
   return strings;
@@ -10438,12 +10438,12 @@ YY_RULE_SETUP
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 256 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 258 "ext/scan_rails_logs/scan_rails_logs.yy"
 /* ignore */
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 257 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 259 "ext/scan_rails_logs/scan_rails_logs.yy"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
 #line 10450 "ext/scan_rails_logs/scan_rails_logs.yy.c"
@@ -10635,7 +10635,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -10649,7 +10649,7 @@ static int yy_get_next_buffer (void)
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -10680,7 +10680,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -10798,7 +10798,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -10822,7 +10822,7 @@ static int yy_get_next_buffer (void)
 				case EOB_ACT_END_OF_FILE:
 					{
 					if ( rails_logs_yywrap( ) )
-						return EOF;
+						return 0;
 
 					if ( ! (yy_did_buffer_switch_on_eof) )
 						YY_NEW_FILE;
@@ -11072,7 +11072,7 @@ void rails_logs_yypop_buffer_state (void)
  */
 static void rails_logs_yyensure_buffer_stack (void)
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -11169,12 +11169,11 @@ YY_BUFFER_STATE rails_logs_yy_scan_string (yyconst char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE rails_logs_yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE rails_logs_yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
-	yy_size_t n;
-	int i;
+	yy_size_t n, i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -11256,7 +11255,7 @@ FILE *rails_logs_yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-int rails_logs_yyget_leng  (void)
+yy_size_t rails_logs_yyget_leng  (void)
 {
         return rails_logs_yyleng;
 }
@@ -11404,7 +11403,7 @@ void rails_logs_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 257 "ext/scan_rails_logs/scan_rails_logs.yy"
+#line 259 "ext/scan_rails_logs/scan_rails_logs.yy"
 
 
 

@@ -62,6 +62,8 @@ YEAR [0-9][0-9][0-9][0-9]
 
 PLUSMINUS (\+|\-)
 
+TIMING [0-9]+\.[0-9]+
+
 REL_URL (\/|\\|\.)[a-z0-9\._\~\-\/\?&;#=\%\:\+\[\]\\]*
 
 PROTO (http:|https:)
@@ -74,7 +76,7 @@ HTTP_VERB (get|head|put|post|delete|trace|connect)
 
 HTTPCODE (100|101|20[0-6]|30[0-5]|307|40[0-9]|41[0-7]|50[0-5])
 
-BROWSER_STR \"(moz|msie|lynx).+\"
+BROWSER_STR \"(moz|msie|lynx|reconnoiter|pingdom)[^"]+\"
 
 
 %%
@@ -82,6 +84,11 @@ BROWSER_STR \"(moz|msie|lynx).+\"
     Actions 
  */
   
+
+{TIMING} {
+  KVPAIR timing = {"timing", yytext};
+  return timing;
+}
 
 {IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT} {
   KVPAIR ipv4_addr = {"ipv4_addr", yytext};

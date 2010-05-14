@@ -27,8 +27,7 @@ IPV4_ACTION_TEXT =
   end
   
   it "should generate the code for an extconf file" do
-    expected = 'require "mkmf"' + "\n" + '$CFLAGS += " -Wall"' + "\n" +
-    'create_makefile "teeth/scan_rspec_awesome", "./"' + "\n"
+    expected = %Q{require "mkmf"\n$CFLAGS += " -Wall"\nhave_library("uuid", "uuid_generate_time")\ncreate_makefile "teeth/scan_rspec_awesome\", "./"\n}
     @scanner.extconf.should == expected
   end
   

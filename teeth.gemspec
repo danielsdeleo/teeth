@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{teeth}
-  s.version = "0.1.2"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel DeLeo"]
-  s.date = %q{2009-12-02}
+  s.date = %q{2010-05-14}
   s.description = %q{Fast log file parsing in Ruby}
   s.email = %q{ddeleo@basecommander.net}
   s.extensions = ["ext/scan_apache_logs/extconf.rb", "ext/scan_rails_logs/extconf.rb"]
@@ -21,44 +21,19 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION.yml",
-     "doc/classes/String.html",
-     "doc/classes/Teeth.html",
-     "doc/classes/Teeth/DuplicateDefinitionError.html",
-     "doc/classes/Teeth/DuplicateRuleError.html",
-     "doc/classes/Teeth/InvalidDefaultDefinitionName.html",
-     "doc/classes/Teeth/InvalidExtensionDirectory.html",
-     "doc/classes/Teeth/RuleStatement.html",
-     "doc/classes/Teeth/RuleStatementGroup.html",
-     "doc/classes/Teeth/Scanner.html",
-     "doc/classes/Teeth/ScannerDefinition.html",
-     "doc/classes/Teeth/ScannerDefinitionArgumentError.html",
-     "doc/classes/Teeth/ScannerDefinitionGroup.html",
-     "doc/classes/Teeth/ScannerError.html",
-     "doc/created.rid",
-     "doc/files/README_rdoc.html",
-     "doc/files/ext/scan_apache_logs/scan_apache_logs_yy_c.html",
-     "doc/files/ext/scan_rails_logs/scan_rails_logs_yy_c.html",
-     "doc/files/lib/rule_statement_rb.html",
-     "doc/files/lib/scanner_definition_rb.html",
-     "doc/files/lib/scanner_rb.html",
-     "doc/files/lib/teeth_rb.html",
-     "doc/fr_class_index.html",
-     "doc/fr_file_index.html",
-     "doc/fr_method_index.html",
-     "doc/index.html",
-     "doc/rdoc-style.css",
      "ext/scan_apache_logs/extconf.rb",
      "ext/scan_apache_logs/scan_apache_logs.yy",
      "ext/scan_apache_logs/scan_apache_logs.yy.c",
      "ext/scan_rails_logs/extconf.rb",
      "ext/scan_rails_logs/scan_rails_logs.yy",
      "ext/scan_rails_logs/scan_rails_logs.yy.c",
-     "lib/rule_statement.rb",
-     "lib/scanner.rb",
-     "lib/scanner_definition.rb",
      "lib/teeth.rb",
-     "scanners/scan_apache_logs.rb",
-     "scanners/scan_rails_logs.rb",
+     "lib/teeth/rule_statement.rb",
+     "lib/teeth/scanner.rb",
+     "lib/teeth/scanner_definition.rb",
+     "lib/teeth/scanner_definitions/scan_apache_logs.rb",
+     "lib/teeth/scanner_definitions/scan_rails_logs.rb",
+     "lib/teeth/templates/tokenizer.yy.erb",
      "spec/fixtures/rails_1x.log",
      "spec/fixtures/rails_22.log",
      "spec/fixtures/rails_22_cached.log",
@@ -72,13 +47,12 @@ Gem::Specification.new do |s|
      "spec/unit/scan_rails_logs_spec.rb",
      "spec/unit/scaner_definition_spec.rb",
      "spec/unit/scanner_spec.rb",
-     "teeth.gemspec",
-     "templates/tokenizer.yy.erb"
+     "teeth.gemspec"
   ]
   s.homepage = %q{http://github.com/danielsdeleo/teeth}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = [["lib"]]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Fast log file parsing in Ruby}
   s.test_files = [
     "spec/playground/scan_rails_logs.rb",

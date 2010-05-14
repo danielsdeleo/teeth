@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + "/../lib/teeth")
-scanner = Teeth::Scanner.new(:rails_logs, File.dirname(__FILE__) + '/../ext/scan_rails_logs/')
+require "teeth"
+scanner = Teeth::Scanner.new(:rails_logs, TEETH_EXT_DIR + '/scan_rails_logs/')
 scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
 scanner.rdoc = <<-RDOC
 Scans self, which is expected to be a line from a Rails production or dev log,

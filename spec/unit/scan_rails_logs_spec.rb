@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-require "teeth/scan_rails_logs"
+#require "teeth/scan_rails_logs"
 # special shout out to Willem van Bergen, author of request-log-analyzer:
 # http://github.com/wvanbergen/request-log-analyzer/
 # Thanks for the log samples!
@@ -25,7 +25,7 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   it "should extract an error, error_message, line of code, source code file, and stack_trace from a ``RuntimeError'' line" do
     line = %q{RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' }
     result = line.scan_rails_logs
-    puts "###\n" + result.inspect
+    #puts "###\n" + result.inspect
     result[:error].first.should == "RuntimeError"
     result[:error_message].first.should == "Cannot destroy employee"
     result[:file_and_line].first.should == "/app/models/employee.rb:198"
@@ -45,7 +45,7 @@ describe "Rails Request Log Lexer", "when lexing Rails 1.x logs" do
   it "should also process a different 1.x ``Completed'' line correctly" do
     alt_1x = %q{Completed in 0.04180 (23 reqs/sec) | Rendering: 0.02667 (63%) | DB: 0.00259 (6%) | 200 OK [http://localhost/]}
     result = alt_1x.scan_rails_logs
-    puts result.inspect
+    #puts result.inspect
     result[:teaser].first.should == "Completed in"
     result[:duration_s].first.should == "0.04180"
     result[:view_s].first.should == "0.02667"

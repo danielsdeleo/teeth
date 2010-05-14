@@ -8,6 +8,8 @@ Spec::Rake::SpecTask.new do |t|
   t.fail_on_error = false
 end
 
+task :default => :spec
+
 namespace :spec do
 
   desc "Generate HTML report for failing examples"

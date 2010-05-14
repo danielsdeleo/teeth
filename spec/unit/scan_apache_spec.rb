@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-require "teeth/scan_apache_logs"
 $INCLUDE_SLOW_TESTS = true
 
 describe "Apache Lexer Extension", "when lexing apache errors" do

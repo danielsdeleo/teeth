@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + "/../lib/teeth")
-scanner = Teeth::Scanner.new(:apache_logs, File.dirname(__FILE__) + '/../ext/scan_apache_logs/')
+require "teeth"
+scanner = Teeth::Scanner.new(:apache_logs, TEETH_EXT_DIR + '/scan_apache_logs/')
 scanner.load_default_definitions_for(:whitespace, :ip, :time, :web)
 scanner.rdoc = <<-RDOC
 Scans self, which is expected to be a single line from an Apache error or 
@@ -10,6 +10,7 @@ client, any absolute or relative URLs, the error level, HTTP response code,
 HTTP Method (verb), and any other uncategorized strings present.
 RDOC
 scanner.rules do |r|
+  r.timing '{TIMING}'
   r.ipv4_addr '{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}"."{IP4_OCT}'
   r.apache_err_datetime '{WDAY}{WS}{MON}{WS}{MDAY}{WS}{HOUR}":"{MINSEC}":"{MINSEC}{WS}{YEAR}'
   r.apache_access_datetime '{MDAY}\/{MON}\/{YEAR}":"{HOUR}":"{MINSEC}":"{MINSEC}{WS}{PLUSMINUS}{YEAR}'
